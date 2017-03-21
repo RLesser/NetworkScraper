@@ -14,15 +14,15 @@ class pppNetwork(NetworkScraper):
 		soup = self.url_to_soup(BASE_ADDR + PIRATE_STR(nodeId))
 		return soup
 
-	def getAdjNodeIds(self, data):
+	def getEdgeData(self, data):
 		friendImg = data.find_all("img", src="/yoweb/images/matey.png")
 		if len(friendImg) == 0:
 			return []
 		friendDiv = friendImg[0].parent.parent.parent.find_all('a')
 		#print friendDiv
-		friendList = [str(x.text) for x in friendDiv]
+		friendEdges = [self.makeEdgeObject(str(x.text)) for x in friendDiv]
 		#print friendList
-		return friendList
+		return friendEdges
 
 class ppfNetwork(NetworkScraper):
 	"""network scraping subclass specifically for Puzzle Pirate flags"""
@@ -39,10 +39,51 @@ class ppfNetwork(NetworkScraper):
 		flagName = data.find_all("font", size="+2")[0].text
 		return flagName
 
-	def getAdjNodeIds(self, data):
+	def getEdgeData(self, data):
 		allLinks = data.find_all("a")
 		flagLinks = [x for x in allLinks if "flagid" in x['href']]
-		return [link['href'].split('&')[0].split('=')[-1] for link in flagLinks]
+
+		visibleStatus = ""
+		colorStatus = ""
+		visibleStatusDict = {}
+		colorStatusDict = {}
+		if len(flagLinks) == 0:
+			return []
+		for item in flagLinks[0].parent.text.split('\n'):
+
+			if item == "At war with:":
+				visibleStatus = True
+				colorStatus = "r"
+			elif item == "Allied with:":
+				visibleStatus = True
+				colorStatus = "g"
+			elif item == "Declaring war against:":
+				visibleStatus = False
+				colorStatus = ""
+			elif item == "Trying to form an alliance with:":
+				visibleStatus = False
+				colorStatus = ""
+			elif item == "Islands controlled by this flag:":
+				visibleStatus = "islands"
+			elif visibleStatus != "islands":
+				visibleStatusDict[item] = visibleStatus
+				colorStatusDict[item] = colorStatus
+
+		#print visibleStatusDict
+		#print colorStatusDict
+
+		idDict = {}
+		for link in flagLinks:
+			idDict[link['href'].split('&')[0].split('=')[-1]] = link.text
+
+		#print idDict
+
+		flagEdges = [self.makeEdgeObject(flagId, visibleStatusDict[idDict[flagId]], \
+						colorStatusDict[idDict[flagId]]) \
+					 for flagId in idDict.keys()]
+
+		#print flagEdges
+		return flagEdges
 		 
 
 

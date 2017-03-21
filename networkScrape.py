@@ -32,26 +32,29 @@ class NetworkScraper(object):
 		return None
 
 
-	def getAdjNodeIds(self, data):
-		return []
-
-
 	def getNodeColor(self, data):
 		return 'r'
 
 
-	def getEdgeColors(self, data):
-		return []
+	def getEdgeData(self, data):
+		return None
 
+
+	def makeEdgeObject(self, nodeId, edgeColor = 'r', edgeVisible = True):
+		edge = {
+			'nodeId': nodeId,
+			'edgeColor': edgeColor,
+			'edgeVisible': edgeVisible
+		}
+		return edge
 
 	def makeBaseNode(self, nodeId):
 		# print "Entering makeBaseNode"
 		node = {
 			'name': None,
 			'nodeId': nodeId,
-			'adjNodeIds': [],
 			'nodeColor': None,
-			'edgeColors': None
+			'edges': []
 		}
 		return node
 
@@ -64,15 +67,15 @@ class NetworkScraper(object):
 		if name == None:
 			name = node['nodeId']
 		node['name'] = name
-		node['adjNodeIds'] = self.getAdjNodeIds(data)
 		node['nodeColor'] = self.getNodeColor(data)
-		node['edgeColors'] = self.getEdgeColors(data)
+		node['edges'] = self.getEdgeData(data)
+		#print node
 		return node
 
 
 	def getNewNodes(self, seedNode):
 		# print "Entering getNewNodes"
-		newNodes = [self.makeBaseNode(nodeId) for nodeId in seedNode['adjNodeIds']]
+		newNodes = [self.makeBaseNode(edge['nodeId']) for edge in seedNode['edges']]
 		return newNodes
 
 
@@ -112,8 +115,20 @@ class NetworkScraper(object):
 		# For now, nodes should just be nodeId
 		# For now, construct graph using dict method
 		graphDict = {}
+		#print "explorelist", self.exploreList
 		for node in self.exploreList:
-			graphDict[node['nodeId']] = node['adjNodeIds']
+			#print node
+			#print len(node['edges'])
+			if len(node['edges']):
+				adjNodes = [edge['nodeId'] for edge in node['edges'] \
+							if edge['edgeVisible']]
+			else:
+				adjNodes = []
+
+			#print adjNodes
+			graphDict[node['nodeId']] = adjNodes
+
+		#print graphDict
 		nxGraph = nx.Graph(graphDict)
 		return nxGraph
 
