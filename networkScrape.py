@@ -48,20 +48,24 @@ class NetworkScraper(object):
 		}
 		return edge
 
+	def getNodeProperties(self, data):
+		return {}
+
 	def makeBaseNode(self, nodeId):
 		# print "Entering makeBaseNode"
 		node = {
 			'name': None,
 			'nodeId': nodeId,
 			'nodeColor': None,
-			'edges': []
+			'edges': [],
+			'properties': {}
 		}
 		return node
 
 
 	def fillNodeData(self, node):
 		# print "Entering fillNodeData"
-		data = self.getDataSource(node['nodeId']);
+		data = self.getDataSource(node['nodeId'])
 		name = self.getNodeName(data)
 		# print "node name:", node['nodeId']
 		if name == None:
@@ -69,6 +73,7 @@ class NetworkScraper(object):
 		node['name'] = name
 		node['nodeColor'] = self.getNodeColor(data)
 		node['edges'] = self.getEdgeData(data)
+		node['properties'] = self.getNodeProperties(data)
 		#print node
 		return node
 
@@ -95,10 +100,11 @@ class NetworkScraper(object):
 			if verbose:
 				print curNodeIdx, '[', len(self.exploreList), ']',
 				print self.exploreList[curNodeIdx]['name']
+				#print self.exploreList[curNodeIdx]['properties']
 			newNodes = self.getNewNodes(self.exploreList[curNodeIdx])
 			newUnusedNodes = self.getUniqueConnections(newNodes)
 			self.exploreList += newUnusedNodes
-			curNodeIdx += 1;
+			curNodeIdx += 1
 
 
 	def saveGraph(self, graphName, path = "./savedData/"):
