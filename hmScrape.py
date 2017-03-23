@@ -19,3 +19,8 @@ class HypeMNetwork(NetworkScraper):
 		friendIds = [friend.find_all("a")[0]['href'][1:] for friend in friendList]
 		friendObjs = [self.makeEdgeObject(fid) for fid in friendIds]
 		return friendObjs
+
+	def getNodeName(self, data):
+		profileData = data.find_all("div", class_ = "header-box")[0]
+		name = profileData.find_all("p", class_ = "username")[0].text
+		return name
