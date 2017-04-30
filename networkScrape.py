@@ -100,7 +100,7 @@ class NetworkScraper(object):
 			if verbose:
 				print curNodeIdx, '[', len(self.exploreList), ']',
 				print self.exploreList[curNodeIdx]['name']
-				#print self.exploreList[curNodeIdx]['properties']
+				print self.exploreList[curNodeIdx]['properties']
 			newNodes = self.getNewNodes(self.exploreList[curNodeIdx])
 			newUnusedNodes = self.getUniqueConnections(newNodes)
 			self.exploreList += newUnusedNodes
@@ -141,5 +141,5 @@ class NetworkScraper(object):
 
 	def graph(self):
 		G = self.makeGraphData()
-		nx.draw(G)
+		nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = 1000))
 		plt.show()

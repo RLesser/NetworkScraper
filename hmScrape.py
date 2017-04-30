@@ -50,10 +50,11 @@ class HypeMNetwork(NetworkScraper):
 
 
 		for num in bigNums:
-			if "Favorites" in num.parent.text:
-				propertiesObj['favorites'] = int(num.text)
-			elif "Friends" in num.parent.text:
-				propertiesObj['friends'] = int(num.text)
+			#print num.parent.text
+			if "Favorite" in num.parent.text:
+				propertiesObj['favorites'] = int(num.text.replace(",",""))
+			elif "Friend" in num.parent.text:
+				propertiesObj['friends'] = int(num.text.replace(",",""))
 			else:
 				print "ERROR IN FAVE / FRIENDS PROPERTY"
 				exit()

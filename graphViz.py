@@ -3,12 +3,13 @@
 import sys
 from ppScrape import *
 from hmScrape import *
+from tmdScrape import *
 
-ns = HypeMNetwork()
-ns.propegateGraph('BobLesser', limit = 2, verbose = True)
+ns = TMDNetwork()
+ns.propegateGraph('arts/steve-jobs-review', limit = 3, verbose = True)
 
 # ns.propegateGraph(10004940, verbose = True)
-#ns.saveGraph('hypeM_1000')
+# ns.saveGraph('tmd_arts_100')
 
-#ns.loadGraph('hypeM_1000')
+# ns.loadGraph('tmd_arts_100')
 ns.graph()
