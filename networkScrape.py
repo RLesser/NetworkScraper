@@ -93,6 +93,9 @@ class NetworkScraper(object):
 	def propegateGraph(self, nodeId, limit = None, verbose = False):
 		self.exploreList.append(self.makeBaseNode(nodeId))
 		curNodeIdx = 0
+		self.nodeExplorations = None
+		if limit != None:
+			self.nodeExplorations = limit
 		while (not limit or curNodeIdx < limit) \
 			and curNodeIdx < len(self.exploreList):
 			fullCurNode = self.fillNodeData(self.exploreList[curNodeIdx])
@@ -109,37 +112,52 @@ class NetworkScraper(object):
 
 	def saveGraph(self, graphName, path = "./savedData/"):
 		with open(path + graphName + ".pkl", "wb") as f:
-			pickle.dump(self.exploreList, f, pickle.HIGHEST_PROTOCOL)
+			pickle.dump([self.exploreList, self.nodeExplorations], f, pickle.HIGHEST_PROTOCOL)
 
 
 	def loadGraph(self, graphName, path = "./savedData/"):
 		with open(path + graphName + ".pkl", "rb") as f:
-			self.exploreList = pickle.load(f)
+			loadedData = pickle.load(f)
+			self.exploreList = loadedData[0]
+			self.nodeExplorations = loadedData[1]
 
 
 	def makeGraphData(self):
 		# For now, nodes should just be nodeId
 		# For now, construct graph using dict method
 		graphDict = {}
-		#print "explorelist", self.exploreList
-		for node in self.exploreList:
-			#print node
-			#print len(node['edges'])
+		#setting the graph dict with keys being the nodes and vals being connections
+		for nodeIdx in range(len(self.exploreList)):
+			node = self.exploreList[nodeIdx]
+			# if the node has edges...
 			if len(node['edges']):
+				# create a list of nodeIds from nodeEdges if the edge is visible
+				# and not a bud (if buds_visible is False)
+				budIdList = [item['nodeId'] for item in self.exploreList[self.nodeExplorations:]]
+				isBud = lambda nodeId: nodeId in budIdList
+				#print node['nodeId']
+				# uncomment list comprehension once logic fixed
 				adjNodes = [edge['nodeId'] for edge in node['edges'] \
-							if edge['edgeVisible']]
+							if edge['edgeVisible'] and \
+							(not isBud(edge['nodeId']) or self.buds_visible)]
+
 			else:
+				# possible to have non-bud (aka explored) node w/o adjNodes
 				adjNodes = []
 
-			#print adjNodes
-			graphDict[node['nodeId']] = adjNodes
+			# if buds_visible is false, dont add buds to graphDict
+			# could possibly end loop early but this works too
+			if nodeIdx < self.nodeExplorations or self.buds_visible:
+				#print "adding node:", node['nodeId']
+				graphDict[node['nodeId']] = adjNodes
 
 		#print graphDict
 		nxGraph = nx.Graph(graphDict)
 		return nxGraph
 
 
-	def graph(self):
+	def graph(self, buds_visible = True):
+		self.buds_visible = buds_visible
 		G = self.makeGraphData()
 		nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = 1000))
 		plt.show()

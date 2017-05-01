@@ -25,12 +25,16 @@ class TMDNetwork(NetworkScraper):
 		# profileData = data.find_all("div", class_ = "header-box")[0]
 		# name = profileData.find("p", class_ = "articleName").text
 		# return name
-		return titleDiv.text
+		return titleDiv.text.strip()
 
 	def getNodeProperties(self, data):
 		propertiesObj = {}
 
-		kicker = data.find_all("div", class_ = "pane-node-field-kicker")[0].text
+		kicker = data.find("div", class_ = "pane-node-field-kicker")
+		if kicker:
+			kicker = kicker.text.strip()
+		else:
+			kicker = ""
 		propertiesObj['kicker'] = kicker
 
 		#section = data.find_all("")
