@@ -153,14 +153,22 @@ class NetworkScraper(object):
 
 		#print graphDict
 		nxGraph = nx.Graph(graphDict)
+		for node in self.exploreList:
+			if node['nodeId'] in nxGraph.node:
+				print node['nodeId']
+				nxGraph.node[node['nodeId']] = node['properties']
 		return nxGraph
+
+	#def color_nodes(self):
+
 
 
 	def graph(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
 		G = self.makeGraphData()
+		print G.node
 		if labels_visible:
-			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations))
+			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations), node_color = ['blue','red'])
 		else:
-			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations))
+			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = ['blue','red'])
 		plt.show()

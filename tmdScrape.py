@@ -35,8 +35,25 @@ class TMDNetwork(NetworkScraper):
 			kicker = kicker.text.strip()
 		else:
 			kicker = ""
-		propertiesObj['kicker'] = kicker
 
-		#section = data.find_all("")
+		url = data.find("link", rel = "canonical")['href']
+		urlPath = url.replace("https://www.michigandaily.com/","").split('/')
+		contentType = urlPath[0]
+		if len(urlPath) > 1:
+			section = urlPath[1]
+		else:
+			section = ""
+		if len(urlPath) > 2:
+			linkTitle = urlPath[2]
+		else:
+			linkTitle = ""
+
+		shortId = int(data.find("link", rel = "shortlink")['href'].split("/")[-1])
+
+		propertiesObj['kicker'] = kicker
+		propertiesObj['contentType'] = contentType
+		propertiesObj['section'] = section
+		propertiesObj['linkTitle'] = linkTitle
+		propertiesObj['shortId'] = shortId
 
 		return propertiesObj
