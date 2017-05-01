@@ -12,4 +12,4 @@ ns = TMDNetwork()
 # ns.saveGraph('tmd_arts_100')
 
 ns.loadGraph('tmd_arts_100')
-ns.graph(buds_visible = True)
+ns.graph(buds_visible = False, labels_visible = False, iterations = 1000)

@@ -156,8 +156,11 @@ class NetworkScraper(object):
 		return nxGraph
 
 
-	def graph(self, buds_visible = True):
+	def graph(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
 		G = self.makeGraphData()
-		nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = 1000))
+		if labels_visible:
+			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations))
+		else:
+			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations))
 		plt.show()
