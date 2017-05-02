@@ -155,20 +155,43 @@ class NetworkScraper(object):
 		nxGraph = nx.Graph(graphDict)
 		for node in self.exploreList:
 			if node['nodeId'] in nxGraph.node:
-				print node['nodeId']
+				#print node['nodeId']
 				nxGraph.node[node['nodeId']] = node['properties']
 		return nxGraph
 
-	#def color_nodes(self):
+	def colorNodes(self, colorType = "cat", keyProperty = None, colorList = None, colorDict = None):
+		if not colorList:
+			colorList = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', 
+						 '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', 
+						 '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', 
+						 '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']
+		self.nodeColorInfo = {}
+		self.nodeColorInfo['type'] = colorType
+		self.nodeColorInfo['keyProperty'] = keyProperty
+		self.nodeColorInfo['colorList'] = colorList
 
+
+	def useColorData(self, G):
+		nodeColors = []
+		termToColorIdx = {}
+		currentColorIdx = 0
+		for node in G.node:
+			if G.node[node]['section'] not in termToColorIdx:
+				termToColorIdx[G.node[node]['section']] = currentColorIdx
+				currentColorIdx += 1
+			colorIdx = termToColorIdx[G.node[node]['section']]
+			color = self.nodeColorInfo['colorList'][colorIdx]
+			nodeColors.append(color)
+		return nodeColors
 
 
 	def graph(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
 		G = self.makeGraphData()
-		print G.node
+		nodeColors = self.useColorData(G)
+		#print G.node
 		if labels_visible:
-			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations), node_color = ['blue','red'])
+			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors)
 		else:
-			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = ['blue','red'])
+			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors)
 		plt.show()

@@ -14,7 +14,7 @@ class TMDNetwork(NetworkScraper):
 		return soup
 
 	def getEdgeData(self, data):
-		nodebox = data.find_all("div", class_ = "nodebox")[0]
+		nodebox = data.find_all("div", class_ = "mlt")[0]
 		links = [x['href'] for x in nodebox.find_all("a")]
 		article_IDs = [x.replace("/section/","") for x in links]
 		edgeObjs = [self.makeEdgeObject(a_id) for a_id in article_IDs]
