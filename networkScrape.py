@@ -175,13 +175,23 @@ class NetworkScraper(object):
 		nodeColors = []
 		termToColorIdx = {}
 		currentColorIdx = 0
-		for node in G.node:
-			if G.node[node]['section'] not in termToColorIdx:
-				termToColorIdx[G.node[node]['section']] = currentColorIdx
-				currentColorIdx += 1
-			colorIdx = termToColorIdx[G.node[node]['section']]
-			color = self.nodeColorInfo['colorList'][colorIdx]
-			nodeColors.append(color)
+		colorType = self.nodeColorInfo['type']
+		key = self.nodeColorInfo['keyProperty']
+		colorList = self.nodeColorInfo['colorList']
+		if colorType == "cat":
+			for node in G.node:
+				if key not in G.node[node]:
+					nodeColors.append('#FFFFFF')
+				else:
+					if G.node[node][key] not in termToColorIdx:
+						termToColorIdx[G.node[node][key]] = currentColorIdx
+						currentColorIdx += 1
+					colorIdx = termToColorIdx[G.node[node][key]]
+					color = colorList[colorIdx]
+					nodeColors.append(color)
+		elif colorType == "scale":
+			print "not yet implimented"
+			exit(1)
 		return nodeColors
 
 
@@ -191,8 +201,7 @@ class NetworkScraper(object):
 		nodeColors = self.useColorData(G)
 		#print G.node
 		if labels_visible:
-			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors)
+			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors, linewidths = 1)
 		else:
-			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors)
+			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors, linewidths = 1)
 		plt.show()
-

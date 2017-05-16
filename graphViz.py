@@ -12,5 +12,5 @@ ns = TMDNetwork()
 # ns.saveGraph('tmd_grades_100')
 
 ns.loadGraph('tmd_arts_100')
-ns.colorNodes()
-ns.graph(buds_visible = False, labels_visible = False, iterations = 5000)
+ns.colorNodes(keyProperty = "section")
+ns.graph(buds_visible = True, labels_visible = False, iterations = 5000)
