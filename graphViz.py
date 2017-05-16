@@ -11,6 +11,6 @@ ns = TMDNetwork()
 # ns.propegateGraph(10004940, verbose = True)
 # ns.saveGraph('tmd_grades_100')
 
-ns.loadGraph('tmd_grades_100')
+ns.loadGraph('tmd_arts_100')
 ns.colorNodes()
 ns.graph(buds_visible = False, labels_visible = False, iterations = 5000)

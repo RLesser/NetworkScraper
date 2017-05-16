@@ -195,3 +195,4 @@ class NetworkScraper(object):
 		else:
 			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors)
 		plt.show()
+
