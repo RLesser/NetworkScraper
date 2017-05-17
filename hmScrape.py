@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 from networkScrape import NetworkScraper
+import datetime
+
 
 class HypeMNetwork(NetworkScraper):
 	"""docstring for HypeMNetwork"""
@@ -9,24 +11,41 @@ class HypeMNetwork(NetworkScraper):
 
 	def getDataSource(self, nodeId):
 		# print "Entering getDataSource"
+		print nodeId
 		PROF_ADDR = lambda userName: "http://hypem.com/" + userName + "/list_friends"
 		soup = self.url_to_soup(PROF_ADDR(nodeId))
-		return soup
+		pageInfo = soup.find('div', class_ = "paginator infinite")
+		soupList = [soup]
+		if pageInfo:
+			numList = [int(str(x.text.encode("utf-8"))) for x in pageInfo.find_all("a")
+					   if str(x.text.encode("utf-8")).isdigit()]
+			if len(numList) != 0:
+				maxPages = max(numList)
+				for pNum in range(2,maxPages+1):
+					soupList.append(self.url_to_soup(PROF_ADDR(nodeId)+"/"+str(pNum)))
+		return soupList
 
 	def getEdgeData(self, data):
-		friendList = data.find_all("div", id = "track-list")
-		friendList = friendList[0].find_all("div", class_ = "user header-box small")
-		friendIds = [friend.find_all("a")[0]['href'][1:] for friend in friendList]
-		friendObjs = [self.makeEdgeObject(fid) for fid in friendIds]
+		allFriendIds = []
+		for page in data:
+			friendList = page.find_all("div", id = "track-list")
+			friendList = friendList[0].find_all("div", class_ = "user header-box")
+			friendIds = [friend.find_all("a")[0]['href'][1:] for friend in friendList]
+			#print friendIds
+			allFriendIds += friendIds
+		#print allFriendIds
+		friendObjs = [self.makeEdgeObject(fid) for fid in allFriendIds]
 		return friendObjs
 
 	def getNodeName(self, data):
+		data = data[0]
 		profileData = data.find_all("div", class_ = "header-box")[0]
-		name = profileData.find("p", class_ = "username").text
+		name = profileData.find("p", class_ = "username").find('a').text.strip()
 		return name
 
 	def getNodeProperties(self, data):
-		DEFAULT_PHOTO_URL = "http://static.hypem.net/images/bg-album-art.gif"
+		data = data[0]
+		DEFAULT_PHOTO_URL = "http://static.hypem.net/images/user_profile_default.png"
 		CUSTOM_PHOTO_BASE_URL = "http://s3.amazonaws.com/faces-s3.hypem.com"
 
 		propertiesObj = {}
@@ -48,36 +67,37 @@ class HypeMNetwork(NetworkScraper):
 
 		bigNums = profileData.find_all(class_ = "big-num")
 
+		#print propertiesObj
 
+		#print bigNums
 		for num in bigNums:
-			print num
-			#print num.parent.text
 			if "Favorite" in num.parent.text:
 				propertiesObj['favorites'] = int(num.text.replace(",",""))
 			elif "Friend" in num.parent.text:
 				propertiesObj['friends'] = int(num.text.replace(",",""))
+			elif "Site" in num.parent.text:
+				propertiesObj['sites'] = int(num.text.replace(",",""))
+			elif "Artist" in num.parent.text:
+				propertiesObj['artists'] = int(num.text.replace(",",""))
 			else:
 				print "ERROR IN FAVE / FRIENDS PROPERTY"
 				exit()
 
-		followData = profileData.find(class_ = "follow-information")
+		dateStr = str(profileData.find('p', class_ = "join-date").text)
+		dateList = dateStr.replace("Joined ", "").split()
+		day = dateList[1][0:-3]
+		if len(day) == 1:
+			day = "0" + day
+		dateList[1] = day
+		dateStr = " ".join(dateList)
+		dateObj = datetime.datetime.strptime(dateStr, "%b %d %Y")
+		propertiesObj['joinDate'] = dateObj
 
-		for link in followData.find_all("a"):
-			value = 0
-			if link.text.split()[0] != "no":
-				value = int(link.text.split()[0])
-
-
-			if "blog" in link.text.split()[1]:
-				propertiesObj["blogFollows"] = value;
-			elif "artist" in link.text.split()[1]:
-				propertiesObj["artistFollows"] = value;
-			else:
-				print "ERROR IN BLOG / ARTIST PROPERTY"
-				exit()
-
-		followData.find_all("a")[0].text.split()[0]
-		#print followData.find_all("a")[1].text.split()[0]
-
+		nameArea = profileData.find("p", class_ = "username")
+		supporter = nameArea.find('a', class_ = 'supporter-badge')
+		if supporter:
+			propertiesObj['supporter'] = True
+		else:
+			propertiesObj['supporter'] = False
 
 		return propertiesObj

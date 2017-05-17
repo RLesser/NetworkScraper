@@ -6,7 +6,7 @@ var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(0.3).strength(1.6))
-    .force("charge", d3.forceManyBody().strength(-20).distanceMax(1000))
+    .force("charge", d3.forceManyBody().strength(-20).distanceMax(220))
     .force("center", d3.forceCenter(width / 2, height / 2))
     .alphaDecay(0.002);
 
@@ -25,7 +25,7 @@ d3.json("force.json", function(error, graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("r", 5)
+      .attr("r", 2)
       .attr("fill", function(d) { return color(d.group); })
       .call(d3.drag()
           .on("start", dragstarted)

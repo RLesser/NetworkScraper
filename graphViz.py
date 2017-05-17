@@ -1,17 +1,19 @@
 #!/usr/bin/python
 
 import sys
+import time
 from ppScrape import *
 from hmScrape import *
 from tmdScrape import *
 
-ns = TMDNetwork()
-#ns.propegateGraph('no-section/michigan-daily-grade-guide-compare-class-grade-distributions-across-lsa', limit = 10, verbose = True)
+ns = HypeMNetwork()
+# ns.propegateGraph('BobLesser', limit = 1000, verbose = True)
+# 989 -> 3221
 
 # ns.propegateGraph(10004940, verbose = True)
-#ns.saveGraph('tmd_arts_10')
-
-ns.loadGraph('tmd_grades_100')
+# ns.saveGraph('HypeM_1000')
+ns.loadGraph('HypeM_1000')
 # ns.colorNodes(keyProperty = "section")
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
-ns.graphD3()
+# time.sleep(5)
+ns.graphD3(buds_visible = False)

@@ -10,7 +10,6 @@ import os
 import json
 import SimpleHTTPServer
 
-
 class NetworkScraper(object):
 	"""base class for scraping websites for network connections"""
 	def __init__(self):
@@ -247,10 +246,13 @@ class NetworkScraper(object):
 
 		try:
 			httpd = SocketServer.TCPServer(("", PORT), Handler)
-			print "serving at port", PORT
-			httpd.serve_forever()
 		except Exception as e:
+			print e
 			print "port already open, continuing"
+		else:
+			print "serving at port", PORT
+			webbrowser.open("http://localhost:8000/forceD3/force.html")
+			httpd.serve_forever()
 
 		
 
@@ -266,5 +268,4 @@ class NetworkScraper(object):
 		# nodeLinkData = nx.readwrite.d3_js(G)
 		#print G
 		json.dump(G, open('forceD3/force.json','w'))
-		webbrowser.open("http://localhost:8000/forceD3/force.html")
 		self.basicWebServer()
