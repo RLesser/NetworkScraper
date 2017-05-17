@@ -132,7 +132,7 @@ class NetworkScraper(object):
 		graphDict = {}
 		#setting the graph dict with keys being the nodes and vals being connections
 		for nodeIdx in range(len(self.exploreList)):
-			print self.exploreList
+			#print self.exploreList
 			node = self.exploreList[nodeIdx]
 			# if the node has edges...
 			if len(node['edges']):
@@ -197,7 +197,7 @@ class NetworkScraper(object):
 		self.nodeColorInfo['colorList'] = colorList
 
 
-	def useColorData(self, G):
+	def useColorData(self, G, mode):
 		nodeColors = []
 		termToColorIdx = {}
 		currentColorIdx = 0
@@ -205,16 +205,21 @@ class NetworkScraper(object):
 		key = self.nodeColorInfo['keyProperty']
 		colorList = self.nodeColorInfo['colorList']
 		if colorType == "cat":
-			for node in G.node:
-				if key not in G.node[node]:
-					nodeColors.append('#FFFFFF')
-				else:
-					if G.node[node][key] not in termToColorIdx:
-						termToColorIdx[G.node[node][key]] = currentColorIdx
-						currentColorIdx += 1
-					colorIdx = termToColorIdx[G.node[node][key]]
-					color = colorList[colorIdx]
-					nodeColors.append(color)
+			if mode == "networkx":
+				for node in G.node:
+					if key not in G.node[node]:
+						nodeColors.append('#FFFFFF')
+					else:
+						if G.node[node][key] not in termToColorIdx:
+							termToColorIdx[G.node[node][key]] = currentColorIdx
+							currentColorIdx += 1
+						colorIdx = termToColorIdx[G.node[node][key]]
+						color = colorList[colorIdx]
+						nodeColors.append(color)
+			elif mode == "d3":
+				# add some way for this to edit color list in js
+				pass
+
 		elif colorType == "scale":
 			print "not yet implimented"
 			exit(1)
@@ -224,7 +229,7 @@ class NetworkScraper(object):
 	def graphNetworkx(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
 		G = self.makeGraphData()
-		nodeColors = self.useColorData(G)
+		nodeColors = self.useColorData(G, 'networkx')
 		#print G.node
 		if labels_visible:
 			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors, linewidths = 1)
@@ -240,10 +245,14 @@ class NetworkScraper(object):
 
 		Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 
-		httpd = SocketServer.TCPServer(("", PORT), Handler)
+		try:
+			httpd = SocketServer.TCPServer(("", PORT), Handler)
+			print "serving at port", PORT
+			httpd.serve_forever()
+		except Exception as e:
+			print "port already open, continuing"
 
-		print "serving at port", PORT
-		httpd.serve_forever()
+		
 
 	def graphD3(self, buds_visible = True):
 		# possibly combine with above?
@@ -255,7 +264,7 @@ class NetworkScraper(object):
 		#for item in nx.readwrite.__dict__:
 			#print item
 		# nodeLinkData = nx.readwrite.d3_js(G)
-		print G
+		#print G
 		json.dump(G, open('forceD3/force.json','w'))
 		webbrowser.open("http://localhost:8000/forceD3/force.html")
 		self.basicWebServer()
