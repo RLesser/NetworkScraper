@@ -214,8 +214,8 @@ class NetworkScraper(object):
 		colorType = self.nodeColorInfo['type']
 		key = self.nodeColorInfo['keyProperty']
 		colorList = self.nodeColorInfo['colorList']
-		if colorType == "cat":
-			if mode == "networkx":
+		if mode == "networkx":
+			if colorType == "cat":
 				for node in G.node:
 					if key not in G.node[node]:
 						nodeColors.append('#FFFFFF')
@@ -226,20 +226,29 @@ class NetworkScraper(object):
 						colorIdx = termToColorIdx[G.node[node][key]]
 						color = colorList[colorIdx]
 						nodeColors.append(color)
-			elif mode == "d3":
-				# add some way for this to edit color list in js
-				pass
+			elif colorType == "scale":
+				print "not yet implimented"
+				exit(1)
+			return nodeColors
+		elif mode == "d3":
+			if colorType == "cat":
+				for node in G['nodes']:
+					print node['properties']
+					node['group'] = node['properties'][key]					
+			elif colorType == "scale":
+				print "not yet implimented"
+				exit(1)
+			return G
 
-		elif colorType == "scale":
-			print "not yet implimented"
-			exit(1)
-		return nodeColors
+		
+		
 
 
 	def graphNetworkx(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
 		G = self.makeGraphData()
-		nodeColors = self.useColorData(G, 'networkx')
+		if hasattr(self, 'nodeColorInfo'):
+			nodeColors = self.useColorData(G, 'networkx')
 		#print G.node
 		if labels_visible:
 			nx.draw_networkx(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors, linewidths = 1)
@@ -275,6 +284,8 @@ class NetworkScraper(object):
 		# possibly combine with above?
 		self.buds_visible = buds_visible
 		G = self.makeGraphData(mode = "d3")
+		if hasattr(self, 'nodeColorInfo'):
+			G = self.useColorData(G, "d3")
 		# for item in adjList:
 		# 	print item
 		#nodeColors = self.useColorData(G)
