@@ -5,6 +5,10 @@ import bs4
 import networkx as nx
 import matplotlib.pyplot as plt
 import pickle
+import webbrowser
+import os
+import json
+import SimpleHTTPServer
 
 
 class NetworkScraper(object):
@@ -122,12 +126,13 @@ class NetworkScraper(object):
 			self.nodeExplorations = loadedData[1]
 
 
-	def makeGraphData(self):
+	def makeGraphData(self, mode = 'networkx'):
 		# For now, nodes should just be nodeId
 		# For now, construct graph using dict method
 		graphDict = {}
 		#setting the graph dict with keys being the nodes and vals being connections
 		for nodeIdx in range(len(self.exploreList)):
+			print self.exploreList
 			node = self.exploreList[nodeIdx]
 			# if the node has edges...
 			if len(node['edges']):
@@ -152,12 +157,33 @@ class NetworkScraper(object):
 				graphDict[node['nodeId']] = adjNodes
 
 		#print graphDict
-		nxGraph = nx.Graph(graphDict)
-		for node in self.exploreList:
-			if node['nodeId'] in nxGraph.node:
-				#print node['nodeId']
-				nxGraph.node[node['nodeId']] = node['properties']
-		return nxGraph
+		if mode == 'networkx':
+			nxGraph = nx.Graph(graphDict)
+			for node in self.exploreList:
+				if node['nodeId'] in nxGraph.node:
+					#print node['nodeId']
+					nxGraph.node[node['nodeId']] = node['properties']
+			return nxGraph
+
+		elif mode == 'd3':
+			nodeList = []
+			linkList = []
+			for item in graphDict:
+				nodeObj = {}
+				nodeObj['id'] = item
+				nodeList.append(nodeObj)
+				for link in graphDict[item]:
+					linkObj = {}
+					linkObj['source'] = item
+					linkObj['target'] = link
+					linkObj['value'] = 1
+					linkList.append(linkObj)
+			graphObj = {
+				"nodes" : nodeList,
+				"links" : linkList
+			}
+			return graphObj
+			#print graphDict
 
 	def colorNodes(self, colorType = "cat", keyProperty = None, colorList = None, colorDict = None):
 		if not colorList:
@@ -195,7 +221,7 @@ class NetworkScraper(object):
 		return nodeColors
 
 
-	def graph(self, buds_visible = True, labels_visible = True, iterations = 1000):
+	def graphNetworkx(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
 		G = self.makeGraphData()
 		nodeColors = self.useColorData(G)
@@ -205,3 +231,31 @@ class NetworkScraper(object):
 		else:
 			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors, linewidths = 1)
 		plt.show()
+
+	def basicWebServer(self):
+		import SimpleHTTPServer
+		import SocketServer
+
+		PORT = 8000
+
+		Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+
+		httpd = SocketServer.TCPServer(("", PORT), Handler)
+
+		print "serving at port", PORT
+		httpd.serve_forever()
+
+	def graphD3(self, buds_visible = True):
+		# possibly combine with above?
+		self.buds_visible = buds_visible
+		G = self.makeGraphData(mode = "d3")
+		# for item in adjList:
+		# 	print item
+		#nodeColors = self.useColorData(G)
+		#for item in nx.readwrite.__dict__:
+			#print item
+		# nodeLinkData = nx.readwrite.d3_js(G)
+		print G
+		json.dump(G, open('forceD3/force.json','w'))
+		webbrowser.open("http://localhost:8000/forceD3/force.html")
+		self.basicWebServer()

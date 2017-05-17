@@ -50,6 +50,7 @@ class HypeMNetwork(NetworkScraper):
 
 
 		for num in bigNums:
+			print num
 			#print num.parent.text
 			if "Favorite" in num.parent.text:
 				propertiesObj['favorites'] = int(num.text.replace(",",""))
