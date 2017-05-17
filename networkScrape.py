@@ -9,6 +9,7 @@ import webbrowser
 import os
 import json
 import SimpleHTTPServer
+import datetime
 
 class NetworkScraper(object):
 	"""base class for scraping websites for network connections"""
@@ -164,12 +165,22 @@ class NetworkScraper(object):
 					nxGraph.node[node['nodeId']] = node['properties']
 			return nxGraph
 
+
 		elif mode == 'd3':
 			nodeList = []
 			linkList = []
 			for item in graphDict:
+				infoGen = (node for node in self.exploreList if node['nodeId'] == item)
+				print item
+				nodeInfo = infoGen.next()
 				nodeObj = {}
 				nodeObj['id'] = item
+				nodeObj['name'] = nodeInfo['name']
+				nodeObj['properties'] = nodeInfo['properties']
+				# datetimes need to be edited for the json
+				for prop in nodeObj['properties']:
+					if isinstance(nodeObj['properties'][prop], datetime.datetime):
+						nodeObj['properties'][prop] = str(nodeObj['properties'][prop])
 				nodeList.append(nodeObj)
 				for link in graphDict[item]:
 					linkObj = {}
@@ -244,15 +255,19 @@ class NetworkScraper(object):
 
 		Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 
-		try:
-			httpd = SocketServer.TCPServer(("", PORT), Handler)
-		except Exception as e:
-			print e
-			print "port already open, continuing"
-		else:
-			print "serving at port", PORT
-			webbrowser.open("http://localhost:8000/forceD3/force.html")
-			httpd.serve_forever()
+		while (True):
+			try:
+				print "Trying to open on port", PORT
+				httpd = SocketServer.TCPServer(("", PORT), Handler)
+			except Exception as e:
+				print "port", PORT, "did not work, checking next port"
+				PORT += 1
+			else:
+				break
+
+		print "serving at port", PORT
+		webbrowser.open("http://localhost:"+str(PORT)+"/forceD3/force.html")
+		httpd.serve_forever()
 
 		
 
