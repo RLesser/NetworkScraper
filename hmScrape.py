@@ -30,7 +30,13 @@ class HypeMNetwork(NetworkScraper):
 		for page in data:
 			friendList = page.find_all("div", id = "track-list")
 			friendList = friendList[0].find_all("div", class_ = "user header-box")
-			friendIds = [friend.find_all("a")[0]['href'][1:] for friend in friendList]
+			friendIds = []
+			for friend in friendList:
+				friendData = friend.find("div", class_ = "infoslices").find_all("a")
+				friendFriends = friendData[1].find("span", class_ = "big-num")
+				friendFriendCount = int(friendFriends.text.replace(",",""))
+				if friendFriendCount < 1000: # only real people!
+					friendIds.append(friend.find_all("a")[0]['href'][1:])
 			#print friendIds
 			allFriendIds += friendIds
 		#print allFriendIds
