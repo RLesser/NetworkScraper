@@ -171,7 +171,7 @@ class NetworkScraper(object):
 			linkList = []
 			for item in graphDict:
 				infoGen = (node for node in self.exploreList if node['nodeId'] == item)
-				print item
+				#print item
 				nodeInfo = infoGen.next()
 				nodeObj = {}
 				nodeObj['id'] = item
@@ -232,17 +232,22 @@ class NetworkScraper(object):
 			return nodeColors
 		elif mode == "d3":
 			if colorType == "cat":
-				for node in G['nodes']:
-					print node['properties']
-					node['group'] = node['properties'][key]					
+				for nodeIdx in range(len(G['nodes'])):
+					node = G['nodes'][nodeIdx]
+					if key not in node['properties']:
+						node['color'] = '#FFFFFF'
+					else:
+						if node['properties'][key] not in termToColorIdx:
+							termToColorIdx[node['properties'][key]] = currentColorIdx
+							currentColorIdx += 1
+						colorIdx = termToColorIdx[node['properties'][key]]
+						color = colorList[colorIdx]
+						node['color'] = color
+					G['nodes'][nodeIdx] = node
 			elif colorType == "scale":
 				print "not yet implimented"
 				exit(1)
 			return G
-
-		
-		
-
 
 	def graphNetworkx(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
@@ -277,8 +282,6 @@ class NetworkScraper(object):
 		print "serving at port", PORT
 		webbrowser.open("http://localhost:"+str(PORT)+"/forceD3/force.html")
 		httpd.serve_forever()
-
-		
 
 	def graphD3(self, buds_visible = True):
 		# possibly combine with above?

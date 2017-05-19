@@ -2,8 +2,6 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
-
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(0.3).strength(1.6))
     .force("charge", d3.forceManyBody().strength(-20).distanceMax(220))
@@ -26,7 +24,7 @@ d3.json("force.json", function(error, graph) {
     .data(graph.nodes)
     .enter().append("circle")
       .attr("r", 2)
-      .attr("fill", function(d) { return color(d.group); })
+      .attr("fill", function(d) { return d3.rgb(d.color); })
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
