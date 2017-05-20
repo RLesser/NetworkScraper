@@ -21,6 +21,9 @@ class NetworkScraper(object):
 		# self.relationDict = {}
 
 
+
+
+	### GENERAL UTILITY FUNCTIONS ###
 	def url_to_soup(self, url):
 	    req = urllib2.Request(url, headers={ 'User-Agent': 'Mozilla/5.0' })
 	    html = urllib2.urlopen(req).read()
@@ -28,6 +31,43 @@ class NetworkScraper(object):
 	    return soup
 
 
+	def saveGraph(self, graphName, path = "./savedData/"):
+		with open(path + graphName + ".pkl", "wb") as f:
+			pickle.dump([self.exploreList, self.nodeExplorations], f, pickle.HIGHEST_PROTOCOL)
+
+
+	def loadGraph(self, graphName, path = "./savedData/"):
+		with open(path + graphName + ".pkl", "rb") as f:
+			loadedData = pickle.load(f)
+			self.exploreList = loadedData[0]
+			self.nodeExplorations = loadedData[1]
+
+
+	def basicWebServer(self):
+		import SimpleHTTPServer
+		import SocketServer
+
+		PORT = 8000
+
+		Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+
+		while (True):
+			try:
+				print "Trying to open on port", PORT
+				httpd = SocketServer.TCPServer(("", PORT), Handler)
+			except Exception as e:
+				print "port", PORT, "did not work, checking next port"
+				PORT += 1
+			else:
+				break
+
+		print "serving at port", PORT
+		webbrowser.open("http://localhost:"+str(PORT)+"/forceD3/force.html")
+		httpd.serve_forever()
+
+
+
+	### FUNCTIONS TO BE DEFINED IN SUBCLASSES ###
 	def getDataSource(self, nodeId):
 		pass
 
@@ -52,9 +92,13 @@ class NetworkScraper(object):
 		}
 		return edge
 
+
 	def getNodeProperties(self, data):
 		return {}
 
+
+
+	### GRAPH PROPEGATION AND ASSOCIATED FUNCTIONS ###
 	def makeBaseNode(self, nodeId):
 		# print "Entering makeBaseNode"
 		node = {
@@ -114,21 +158,9 @@ class NetworkScraper(object):
 			curNodeIdx += 1
 
 
-	def saveGraph(self, graphName, path = "./savedData/"):
-		with open(path + graphName + ".pkl", "wb") as f:
-			pickle.dump([self.exploreList, self.nodeExplorations], f, pickle.HIGHEST_PROTOCOL)
 
-
-	def loadGraph(self, graphName, path = "./savedData/"):
-		with open(path + graphName + ".pkl", "rb") as f:
-			loadedData = pickle.load(f)
-			self.exploreList = loadedData[0]
-			self.nodeExplorations = loadedData[1]
-
-
-	def makeGraphData(self, mode = 'networkx'):
-		# For now, nodes should just be nodeId
-		# For now, construct graph using dict method
+	### GRAPH COMPILATION AND ASSOCIATED FUNCTIONS ###
+	def createGraphDict(self):
 		graphDict = {}
 		#setting the graph dict with keys being the nodes and vals being connections
 		for nodeIdx in range(len(self.exploreList)):
@@ -155,6 +187,32 @@ class NetworkScraper(object):
 			if nodeIdx < self.nodeExplorations or self.buds_visible:
 				#print "adding node:", node['nodeId']
 				graphDict[node['nodeId']] = adjNodes
+		return graphDict
+
+
+	def filterUnreciprocatedEdges(self, graphDict):
+		# print graphDict
+		for node in graphDict:
+			print node, graphDict[node]
+			symEdges = [edge for edge in graphDict[node]
+						if (node in graphDict[edge])]
+			graphDict[node] = symEdges
+		return graphDict
+
+
+	def removeOrphanNodes(self, graphDict):
+		newGraph = { k:v for k,v in graphDict.items() if v != []}
+		return newGraph
+
+
+	def makeGraphData(self, mode = 'networkx'):
+		# For now, nodes should just be nodeId
+		# For now, construct graph using dict method
+		graphDict = self.createGraphDict()
+
+		# graphDict = self.filterUnreciprocatedEdges(graphDict)
+
+		# graphDict = self.removeOrphanNodes(graphDict)
 
 		#print graphDict
 		if mode == 'networkx':
@@ -194,6 +252,13 @@ class NetworkScraper(object):
 			}
 			return graphObj
 			#print graphDict
+
+
+
+	### GRAPH USER INTERACTION AND ASSOCIATED FUNCTIONS ###
+	def limitNodes(self, buds_visible = True):
+		pass
+
 
 	def colorNodes(self, colorType = "cat", keyProperty = None, colorList = None, colorDict = None):
 		if not colorList:
@@ -249,6 +314,7 @@ class NetworkScraper(object):
 				exit(1)
 			return G
 
+
 	def graphNetworkx(self, buds_visible = True, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
 		G = self.makeGraphData()
@@ -261,27 +327,6 @@ class NetworkScraper(object):
 			nx.draw(G, pos=nx.spring_layout(G, iterations = iterations), node_color = nodeColors, linewidths = 1)
 		plt.show()
 
-	def basicWebServer(self):
-		import SimpleHTTPServer
-		import SocketServer
-
-		PORT = 8000
-
-		Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-
-		while (True):
-			try:
-				print "Trying to open on port", PORT
-				httpd = SocketServer.TCPServer(("", PORT), Handler)
-			except Exception as e:
-				print "port", PORT, "did not work, checking next port"
-				PORT += 1
-			else:
-				break
-
-		print "serving at port", PORT
-		webbrowser.open("http://localhost:"+str(PORT)+"/forceD3/force.html")
-		httpd.serve_forever()
 
 	def graphD3(self, buds_visible = True):
 		# possibly combine with above?

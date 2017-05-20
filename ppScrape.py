@@ -78,8 +78,7 @@ class ppfNetwork(NetworkScraper):
 
 		#print idDict
 
-		flagEdges = [self.makeEdgeObject(flagId, visibleStatusDict[idDict[flagId]], \
-						colorStatusDict[idDict[flagId]]) \
+		flagEdges = [self.makeEdgeObject(flagId) \
 					 for flagId in idDict.keys()]
 
 		#print flagEdges
