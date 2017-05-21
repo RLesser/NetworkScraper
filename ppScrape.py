@@ -30,7 +30,7 @@ class ppfNetwork(NetworkScraper):
 		super(ppfNetwork, self).__init__()
 
 	def getDataSource(self, nodeId):
-		BASE_ADDR = "http://emerald.puzzlepirates.com/yoweb"
+		BASE_ADDR = "http://meridian.puzzlepirates.com/yoweb"
 		FLAG_STR = lambda nodeId: "/flag/info.wm?flagid=" + str(nodeId)
 		soup = self.url_to_soup(BASE_ADDR + FLAG_STR(nodeId))
 		return soup

@@ -184,6 +184,8 @@ class NetworkScraper(object):
 
 			# if buds_visible is false, dont add buds to graphDict
 			# could possibly end loop early but this works too
+			if self.nodeExplorations == None:
+				self.nodeExplorations = len(self.exploreList)
 			if nodeIdx < self.nodeExplorations or self.buds_visible:
 				#print "adding node:", node['nodeId']
 				graphDict[node['nodeId']] = adjNodes
@@ -210,9 +212,15 @@ class NetworkScraper(object):
 		# For now, construct graph using dict method
 		graphDict = self.createGraphDict()
 
-		# graphDict = self.filterUnreciprocatedEdges(graphDict)
+		print graphDict
 
-		# graphDict = self.removeOrphanNodes(graphDict)
+		graphDict = self.filterUnreciprocatedEdges(graphDict)
+
+		print graphDict
+
+		graphDict = self.removeOrphanNodes(graphDict)
+
+		print graphDict
 
 		#print graphDict
 		if mode == 'networkx':
@@ -256,9 +264,8 @@ class NetworkScraper(object):
 
 
 	### GRAPH USER INTERACTION AND ASSOCIATED FUNCTIONS ###
-	def limitNodes(self, buds_visible = True):
+	def limitNode(self, buds_visible = True):
 		pass
-
 
 	def colorNodes(self, colorType = "cat", keyProperty = None, colorList = None, colorDict = None):
 		if not colorList:
@@ -332,6 +339,7 @@ class NetworkScraper(object):
 		# possibly combine with above?
 		self.buds_visible = buds_visible
 		G = self.makeGraphData(mode = "d3")
+		print G
 		if hasattr(self, 'nodeColorInfo'):
 			G = self.useColorData(G, "d3")
 		# for item in adjList:
