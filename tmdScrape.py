@@ -9,6 +9,7 @@ class TMDNetwork(NetworkScraper):
 
 	def getDataSource(self, nodeId):
 		# print "Entering getDataSource"
+		print nodeId
 		PROF_ADDR = lambda articleName: "https://www.michigandaily.com/section/" + articleName
 		soup = self.url_to_soup(PROF_ADDR(nodeId))
 		return soup
@@ -16,7 +17,7 @@ class TMDNetwork(NetworkScraper):
 	def getEdgeData(self, data):
 		nodebox = data.find_all("div", class_ = "mlt")[0]
 		links = [x['href'] for x in nodebox.find_all("a")]
-		article_IDs = [x.replace("/section/","") for x in links]
+		article_IDs = [x.replace("/section/","") for x in links if "/section/" in x]
 		edgeObjs = [self.makeEdgeObject(a_id) for a_id in article_IDs]
 		return edgeObjs
 

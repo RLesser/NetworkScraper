@@ -1,20 +1,17 @@
 #!/usr/bin/python
 
-import sys
-import time
-from networkScrape import *
-from ppScrape import *
-from hmScrape import *
-from tmdScrape import *
+from ppScrape import ppfNetwork, pppNetwork
+from hmScrape import HypeMNetwork
+from tmdScrape import TMDNetwork
 
-ns = ppfNetwork()
-# ns.propegateGraph('BobLesser', limit = 5000, verbose = True)
+ns = TMDNetwork()
+ns.propegateGraph('no-section/michigan-daily-grade-guide-compare-class-grade-distributions-across-lsa', limit = 1000, verbose = True)
 # 989 -> 3221
 
 # ns.propegateGraph(10003215, verbose = True)
-# ns.saveGraph('meridian_all_flags')
-ns.loadGraph('emerald_all_flags')
-# ns.colorNodes(keyProperty = "supporter")
+ns.saveGraph('tmd_grades_1000')
+#ns.loadGraph('tmd_grades_100')
+ns.colorNodes(keyProperty = "section")
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
-ns.graphD3(filter_assym_edges = True)
+ns.graphD3(filter_assym_edges = False)

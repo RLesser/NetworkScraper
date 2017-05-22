@@ -11,7 +11,6 @@ class HypeMNetwork(NetworkScraper):
 
 	def getDataSource(self, nodeId):
 		# print "Entering getDataSource"
-		print nodeId
 		PROF_ADDR = lambda userName: "http://hypem.com/" + userName + "/list_friends"
 		soup = self.url_to_soup(PROF_ADDR(nodeId))
 		pageInfo = soup.find('div', class_ = "paginator infinite")
