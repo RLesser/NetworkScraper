@@ -318,6 +318,7 @@ class NetworkScraper(object):
 						if node['properties'][key] not in termToColorIdx:
 							termToColorIdx[node['properties'][key]] = currentColorIdx
 							currentColorIdx += 1
+							currentColorIdx %= len(colorList)
 						colorIdx = termToColorIdx[node['properties'][key]]
 						color = colorList[colorIdx]
 						node['color'] = color

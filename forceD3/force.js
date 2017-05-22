@@ -1,7 +1,7 @@
 // Zoom stuff
 
-var width = 1200,
-    height = 600;
+var width = 1250,
+    height = 650;
 
 var selected_node = null,
     selected_link = null,
@@ -49,7 +49,7 @@ function rescale() {
 
 
 var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(1).strength(1.1))
+    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(1).strength(1))
     .force("charge", d3.forceManyBody().strength(-20).distanceMax(220))
     .force("center", d3.forceCenter(width / 2, height / 2))
     .alphaDecay(0.0002);
