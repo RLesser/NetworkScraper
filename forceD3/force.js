@@ -52,7 +52,7 @@ var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(0.3).strength(1.6))
     .force("charge", d3.forceManyBody().strength(-20).distanceMax(220))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .alphaDecay(0.002);
+    .alphaDecay(0.0002);
 
 d3.json("force.json", function(error, graph) {
   if (error) throw error;

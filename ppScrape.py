@@ -83,21 +83,6 @@ class ppfNetwork(NetworkScraper):
 
 		#print flagEdges
 		return flagEdges
-		 
-
-
-
-
-	# def getConnections(self, flagId):
-	# 	allLinks = flagSoup.find_all("a")
-	# 	flagLinks = [x for x in allLinks if "flagid" in x['href']]
-	# 	# if len(friendImg) == 0:
-	# 	# 	return []
-	# 	# friendDiv = friendImg[0].parent.parent.parent.find_all('a')
-	# 	# #print friendDiv
-	# 	# friendList = [str(x.text) for x in friendDiv]
-	# 	# #print friendList
-	# 	# return friendList
 		
 
 if __name__ == '__main__':

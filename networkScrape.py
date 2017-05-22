@@ -11,6 +11,9 @@ import json
 import SimpleHTTPServer
 import datetime
 
+class UndefinedFunctionError(Exception):
+	pass
+
 class NetworkScraper(object):
 	"""base class for scraping websites for network connections"""
 	def __init__(self):
@@ -69,32 +72,31 @@ class NetworkScraper(object):
 
 	### FUNCTIONS TO BE DEFINED IN SUBCLASSES ###
 	def getDataSource(self, nodeId):
-		pass
+		raise UndefinedFunctionError("getDataSource must be defined in a subclass. "
+									 "View the docstring for more info on implimentation")
 
 
 	def getNodeName(self, data):
+
 		return None
-
-
-	def getNodeColor(self, data):
-		return 'r'
 
 
 	def getEdgeData(self, data):
-		return None
+		raise UndefinedFunctionError("getEdgeData must be defined in a subclass. "
+									 "View the docstring for more info on implimentation")
 
 
-	def makeEdgeObject(self, nodeId, edgeColor = 'r', edgeVisible = True):
+	def makeEdgeObject(self, nodeId, edgeVisible = True):
 		edge = {
 			'nodeId': nodeId,
-			'edgeColor': edgeColor,
 			'edgeVisible': edgeVisible
 		}
 		return edge
 
 
 	def getNodeProperties(self, data):
-		return {}
+		emptyDict = {}
+		return emptyDict
 
 
 
@@ -119,7 +121,6 @@ class NetworkScraper(object):
 		if name == None:
 			name = node['nodeId']
 		node['name'] = name
-		node['nodeColor'] = self.getNodeColor(data)
 		node['edges'] = self.getEdgeData(data)
 		node['properties'] = self.getNodeProperties(data)
 		#print node
@@ -212,15 +213,23 @@ class NetworkScraper(object):
 		# For now, construct graph using dict method
 		graphDict = self.createGraphDict()
 
-		print graphDict
+		# Three bools: 
+		# removeBuds, filterEdges, removeOrphans -> Non-syms, bud-edges, bud-nodes, bud-like-edges, bud-like-nodes
+		# F,F,F -> T,T,T,T,T - All possible nodes and edges
+		# T,F,F -> T,F,F,T,T - All non-bud nodes and non-bud edges
+		# F,T,F -> F,F,T,F,T - All sym edges, all buds and bud-like are orphan graphs
+		# T,T,F -> F,F,F,F,T - All sym edges, only bud-like are orphan graphs
+		# F,F,T -> ERROR
+		# T,F,T -> ERROR
+		# F,T,T -> F,F,F,F,F - All sym edges, all buds removed
+		# T,T,T -> F,F,F,F,F - All sym edges, all buds removed
 
-		graphDict = self.filterUnreciprocatedEdges(graphDict)
+		# Decision:
+		# Only allow removeBuds and filterEdges, have removeOphans as part of filterEdges
 
-		print graphDict
-
-		graphDict = self.removeOrphanNodes(graphDict)
-
-		print graphDict
+		if self.filter_assym_edges:
+			graphDict = self.filterUnreciprocatedEdges(graphDict)
+			graphDict = self.removeOrphanNodes(graphDict)
 
 		#print graphDict
 		if mode == 'networkx':
@@ -264,9 +273,6 @@ class NetworkScraper(object):
 
 
 	### GRAPH USER INTERACTION AND ASSOCIATED FUNCTIONS ###
-	def limitNode(self, buds_visible = True):
-		pass
-
 	def colorNodes(self, colorType = "cat", keyProperty = None, colorList = None, colorDict = None):
 		if not colorList:
 			colorList = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', 
@@ -322,8 +328,9 @@ class NetworkScraper(object):
 			return G
 
 
-	def graphNetworkx(self, buds_visible = True, labels_visible = True, iterations = 1000):
+	def graphNetworkx(self, buds_visible = False, filter_assym_edges = False, labels_visible = True, iterations = 1000):
 		self.buds_visible = buds_visible
+		self.filter_assym_edges = filter_assym_edges
 		G = self.makeGraphData()
 		if hasattr(self, 'nodeColorInfo'):
 			nodeColors = self.useColorData(G, 'networkx')
@@ -335,9 +342,10 @@ class NetworkScraper(object):
 		plt.show()
 
 
-	def graphD3(self, buds_visible = True):
+	def graphD3(self, buds_visible = False, filter_assym_edges = False):
 		# possibly combine with above?
 		self.buds_visible = buds_visible
+		self.filter_assym_edges = filter_assym_edges
 		G = self.makeGraphData(mode = "d3")
 		print G
 		if hasattr(self, 'nodeColorInfo'):
