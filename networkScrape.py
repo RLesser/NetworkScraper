@@ -11,8 +11,11 @@ import json
 import SimpleHTTPServer
 import datetime
 
+
 class UndefinedFunctionError(Exception):
 	pass
+
+
 
 class NetworkScraper(object):
 	"""base class for scraping websites for network connections"""
@@ -139,12 +142,9 @@ class NetworkScraper(object):
 		return uniqueList
 
 
-	def propegateGraph(self, nodeId, limit = None, verbose = False):
+	def propegateGraph(self, nodeId, save_interval_and_location = None, limit = None, verbose = False):
 		self.exploreList.append(self.makeBaseNode(nodeId))
 		curNodeIdx = 0
-		self.nodeExplorations = None
-		if limit != None:
-			self.nodeExplorations = limit
 		while (not limit or curNodeIdx < limit) \
 			and curNodeIdx < len(self.exploreList):
 			fullCurNode = self.fillNodeData(self.exploreList[curNodeIdx])
@@ -157,6 +157,10 @@ class NetworkScraper(object):
 			newUnusedNodes = self.getUniqueConnections(newNodes)
 			self.exploreList += newUnusedNodes
 			curNodeIdx += 1
+			self.nodeExplorations = curNodeIdx
+			if save_interval_and_location:
+				if curNodeIdx % save_interval_and_location[0] == 0:
+					self.saveGraph(save_interval_and_location[1])
 
 
 
@@ -184,9 +188,6 @@ class NetworkScraper(object):
 				adjNodes = []
 
 			# if buds_visible is false, dont add buds to graphDict
-			# could possibly end loop early but this works too
-			if self.nodeExplorations == None:
-				self.nodeExplorations = len(self.exploreList)
 			if nodeIdx < self.nodeExplorations or self.buds_visible:
 				#print "adding node:", node['nodeId']
 				graphDict[node['nodeId']] = adjNodes
@@ -196,7 +197,7 @@ class NetworkScraper(object):
 	def filterUnreciprocatedEdges(self, graphDict):
 		# print graphDict
 		for node in graphDict:
-			print node, graphDict[node]
+			# print node, graphDict[node]
 			symEdges = [edge for edge in graphDict[node]
 						if (node in graphDict[edge])]
 			graphDict[node] = symEdges
@@ -348,7 +349,7 @@ class NetworkScraper(object):
 		self.buds_visible = buds_visible
 		self.filter_assym_edges = filter_assym_edges
 		G = self.makeGraphData(mode = "d3")
-		print G
+		# print G
 		if hasattr(self, 'nodeColorInfo'):
 			G = self.useColorData(G, "d3")
 		# for item in adjList:
