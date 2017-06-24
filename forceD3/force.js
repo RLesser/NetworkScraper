@@ -1,7 +1,10 @@
 // Zoom stuff
 
-var width = 1250,
-    height = 650;
+console.log(d3.select("#chart").style("width"))
+console.log(d3.select("#chart").style("height"))
+
+var width = parseInt(d3.select("#chart").style("width"), 10)
+    height = parseInt(d3.select("#chart").style("height"), 10);
 
 var selected_node = null,
     selected_link = null,
