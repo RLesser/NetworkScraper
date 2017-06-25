@@ -50,15 +50,19 @@ function rescale() {
 // var max_zoom = 7;
 // var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom])
 
-
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(1).strength(1))
     .force("charge", d3.forceManyBody().strength(-20).distanceMax(220))
     .force("center", d3.forceCenter(width / 2, height / 2))
     .alphaDecay(0.0002);
 
+
+var nodeList = []
+
 d3.json("force.json", function(error, graph) {
   if (error) throw error;
+
+  nodeList = graph.nodes
 
   var link = vis.append("g")
       .attr("class", "links")
@@ -119,4 +123,40 @@ function dragended(d) {
   d.fx = null;
   d.fy = null;
 }
+
+
+//impliment fusejs fuzzy search eventually
+
+var options = {
+  shouldSort: true,
+  threshold: 0.6,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: [
+    "id",
+    "name"
+]
+};
+
+$(document).ready(function() {
+  console.log("test")
+  results = nodeList.map(function(elt){
+    var o = Object.assign({}, elt);
+    o.text = elt.name;
+    o.id = elt.id;
+    return o;
+  })
+  console.log(results)
+  $("#node-search").select2({
+    placeholder: "Select a node...",
+    allowClear: true,
+    data: results
+  });
+  $("#node-search").select2("Robert Lesser")
+});
+
+
+
 

@@ -24,4 +24,4 @@ ns.loadGraph('hypeM_100')
 
 # ns.colorNodes(keyProperty = "state")
 
-ns.graphD3(buds_visible = False, filter_assym_edges = True)
+ns.graphD3(buds_visible = False, filter_assym_edges = False)

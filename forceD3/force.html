@@ -1,12 +1,22 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
   <head>
     <title>Force-Directed Layout</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
-    <link type="text/css" rel="stylesheet" href="force.css"/>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.0.4/fuse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+  <link type="text/css" rel="stylesheet" href="force.css"/>
   </head>
   <body>
-    <div id="chart"></div>
+    <div id="chart">
+    	<div id="search">
+    		<select id="node-search">
+          <option></option>  
+        </select>
+    	</div>
+    </div>
     <script type="text/javascript" src="force.js"></script>
   </body>
 </html>

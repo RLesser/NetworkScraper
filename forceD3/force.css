@@ -4,17 +4,33 @@ html body {
 	height: 100vh;
 }
 
+/* Graph CSS */
+
 #chart {
 	width: 100%;
 	height: 100%;
 }
 
 .nodes circle {
-  stroke: #999;
-  stroke-width: .5px;
+	stroke: #999;
+	stroke-width: .5px;
 }
 
 .links line {
-  stroke: #555;
-  stroke-opacity: .4;
+	stroke: #555;
+	stroke-opacity: .4;
+}
+
+/* Search CSS */
+#search {
+	position: absolute;
+	top: 40px;
+	right: 40px;
+	width: 200px;
+	height: 40px;
+}
+
+#node-search {
+	width: 100%;
+	height: 100%;
 }
