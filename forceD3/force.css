@@ -11,9 +11,14 @@ html body {
 	height: 100%;
 }
 
-.nodes circle {
+.nodes {
 	stroke: #999;
 	stroke-width: .5px;
+}
+
+.nodes.selected {
+	stroke: red;
+	stroke-width: 1px;
 }
 
 .links line {

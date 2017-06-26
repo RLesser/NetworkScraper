@@ -20,7 +20,7 @@ ns = CountyGraph()
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('hypeM_100')
+ns.loadGraph('tmd_arts_10')
 
 # ns.colorNodes(keyProperty = "state")
 
