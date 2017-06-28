@@ -24,18 +24,59 @@ html body {
 .links line {
 	stroke: #555;
 	stroke-opacity: .4;
+	stroke-width: 0.2px;
 }
 
 /* Search CSS */
 #search {
 	position: absolute;
 	top: 40px;
-	right: 40px;
-	width: 200px;
-	height: 40px;
+	right: -160px;
 }
 
 #node-search {
 	width: 100%;
 	height: 100%;
+	width: 200px;
+	height: 40px;
 }
+
+#search-button {
+	width: 30px;
+	height: 30px;
+}
+
+.select2 {
+	vertical-align: inherit;
+	opacity: 0;
+}
+
+
+/* Play/Pause CSS */
+#time-control {
+	position: absolute;
+	top: 40px;
+	left: 40px;
+	opacity: 0.4;
+}
+
+#time-control:hover {
+	opacity: 1;
+}
+
+.button {
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+	transition: 100;
+}
+
+#play-button {
+	display: none;
+}
+
+#pause-button {
+	display: initial;
+}
+
+

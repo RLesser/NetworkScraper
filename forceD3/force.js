@@ -23,27 +23,38 @@ var vis = outer
     .call(d3.zoom().on("zoom", rescale))
     .on("dblclick.zoom", null)
   .append('svg:g')
-    .on("mousedown", mousedown);
+    .on("mousedown", mouseAction)
+    .on("wheel", mouseAction)
 
 vis.append('svg:rect')
     .attr('width', width)
     .attr('height', height)
     .attr('fill', 'white');
 
-function mousedown() {
-  // if (!mousedown_node && !mousedown_link) {
-  //   // allow panning if nothing is selected
-  //   vis.call(d3.behavior.zoom().on("zoom"), rescale);
-  //   return;
-  // }
-  console.log('test')
-  vis.call(d3.zoom().on("zoom"), rescale);
+// var justAfterMouseDown = false
+
+function mouseAction() {
+  // justAfterMouseDown = true
   return;
 }
 
-
 function rescale() {
-  vis.attr("transform", d3.event.transform);
+  // console.log("mousedown?", justAfterMouseDown)
+  // if (justAfterMouseDown) {
+  //   d3.event.transform.k = 1/d3.event.transform.k
+  //   d3.event.transform.x = -1*d3.event.transform.x
+  //   d3.event.transform.y = -1*d3.event.transform.y
+  // }
+  vis.attr("transform", d3.event.transform)
+  // console.log("new round")
+  // console.log("before:", d3.event.transform)
+  // invTrans = d3.event.transform
+  // invTrans.k = 1/d3.event.transform.k
+  // invTrans.x = -1*d3.event.transform.x
+  // invTrans.y = -1*d3.event.transform.y
+  // console.log("after:", invTrans)
+  // d3.select("rect").attr("transform", invTrans)
+  // justAfterMouseDown = false
 }
 
 // var min_zoom = 0.1;
@@ -52,17 +63,20 @@ function rescale() {
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(1).strength(1))
-    .force("charge", d3.forceManyBody().strength(-20).distanceMax(220))
+    .force("charge", d3.forceManyBody().strength(-20))
     .force("center", d3.forceCenter(width / 2, height / 2))
     .alphaDecay(0.0002);
 
 
 var nodeList = []
 
+var graphPaused = false
+
 d3.json("force.json", function(error, graph) {
   if (error) throw error;
 
   nodeList = graph.nodes
+  initSelectBox(nodeList)
 
   var link = vis.append("g")
       .attr("class", "links")
@@ -76,7 +90,7 @@ d3.json("force.json", function(error, graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("id", function(d) {return "id-" + d.id.replace("/","_")})
+      .attr("id", function(d) {return ("id-" + d.id).replace("/","_")})
       .attr("r", 2)
       .attr("fill", function(d) { return d3.rgb(d.color); })
       .call(d3.drag()
@@ -94,18 +108,30 @@ d3.json("force.json", function(error, graph) {
       .on("tick", ticked);
 
   simulation.force("link")
-      .links(graph.links);
+    .links(graph.links);
 
   function ticked() {
-    link
+    if (!graphPaused) {
+      link
         .attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
-    node
+      node
         .attr("cx", function(d) { return d.x; })
         .attr("cy", function(d) { return d.y; });
+    } else {
+      link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+      node
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+    }
   }
 });
 
@@ -149,8 +175,8 @@ var options = {
   ]
 };
 
-$(document).ready(function() {
-  console.log("test")
+function initSelectBox(nodeList) {
+  console.log(nodeList)
   results = nodeList.map(function(elt){
     var o = Object.assign({}, elt);
     o.text = elt.name;
@@ -161,14 +187,48 @@ $(document).ready(function() {
   $("#node-search").select2({
     placeholder: "Select a node...",
     allowClear: true,
-    data: results
+    data: results,
+    dropdownParent: $("#search")
   });
-});
+}
 
 $("#node-search").on("select2:select", function(e) {
   console.log(e.params.data)
   var nodeData = e.params.data
   highlightNode(nodeData.id)
+})
+
+$("#search-button").on("mouseover", function(e) {
+  $("#search").animate({
+    right: "40px"
+  }, 200, function(){})
+  $(".select2").animate({
+    opacity: 100
+  }, 200, function(){
+    // $("select").select2("open")
+  })
+})
+
+$("#search").on("mouseleave", function(e) {
+  $("#search").animate({
+    right: "-160px"
+  }, 200, function(){})
+  $(".select2").animate({
+    opacity: 0
+  }, 200, function(){})
+  $("select").select2("close")
+})
+
+$(".button").on("click", function(e) {
+  if (e.target.id == "pause-button") {
+    $(e.target).css("display", "none")
+    $("#play-button").css("display", "initial")
+    simulation.stop()
+  } else if (e.target.id == "play-button") {
+    $(e.target).css("display", "none")
+    $("#pause-button").css("display", "initial")
+    simulation.restart()
+  }
 })
 
 

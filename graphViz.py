@@ -20,8 +20,8 @@ ns = CountyGraph()
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('tmd_arts_10')
+ns.loadGraph('hypeM_1000')
 
-# ns.colorNodes(keyProperty = "state")
+# ns.colorNodes(keyProperty = "vowelPos")
 
 ns.graphD3(buds_visible = False, filter_assym_edges = False)
