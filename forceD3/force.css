@@ -50,6 +50,7 @@ html body {
 .select2 {
 	vertical-align: inherit;
 	opacity: 0;
+	right: -300px;
 }
 
 

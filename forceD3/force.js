@@ -68,7 +68,7 @@ d3.json("force.json", function(error, graph) {
     .enter().append("circle")
       .attr("id", function(d) {return ("id-" + d.id).replace("/","_")})
       .attr("class", ".nodes")
-      .attr("r", function(d) {return Math.random()*4})
+      .attr("r", function(d) {return Math.random()*10})
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -176,23 +176,30 @@ $("#node-search").on("select2:select", function(e) {
 })
 
 $("#search-button").on("mouseover", function(e) {
+  $(".select2").css("right", "0px")
   $("#search").animate({
-    right: "40px"
+    right: "40px",
   }, 200, function(){})
   $(".select2").animate({
-    opacity: 100
+    opacity: 100,
   }, 200, function(){})
 })
 
 $("#search").on("mouseleave", function(e) {
   $("#search").animate({
-    right: "-160px"
-  }, 200, function(){})
+    right: "-160px",
+  }, 200, function(){
+    $(".select2").css("right", "-300px")
+  })
   $(".select2").animate({
-    opacity: 0
+    opacity: 0,
   }, 200, function(){})
   $("select").select2("close")
 })
+
+// ||================================||
+// || GRAPH TIME CONTROL             ||
+// ||================================||
 
 $(".button").on("click", function(e) {
   if (e.target.id == "pause-button") {
@@ -205,6 +212,8 @@ $(".button").on("click", function(e) {
     simulation.restart()
   }
 })
+
+
 
 
 
