@@ -1,4 +1,6 @@
-// Zoom stuff
+// ||================================||
+// || D3 GRAPH                       ||
+// ||================================||
 
 console.log(d3.select("#chart").style("width"))
 console.log(d3.select("#chart").style("height"))
@@ -65,8 +67,8 @@ d3.json("force.json", function(error, graph) {
     .data(graph.nodes)
     .enter().append("circle")
       .attr("id", function(d) {return ("id-" + d.id).replace("/","_")})
-      .attr("r", 2)
-      .attr("fill", function(d) { return d3.rgb(d.color); })
+      .attr("class", ".nodes")
+      .attr("r", function(d) {return Math.random()*4})
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -115,16 +117,11 @@ function dragended(d) {
   d.fy = null;
 }
 
-function highlightNode(nodeId) {
-  nodeId = nodeId.replace("/","_")
-  console.log('#id-' + nodeId)
-  var node = d3.select('#id-' + nodeId)
-  node.attr("class", "nodes selected")
-}
+// ||================================||
+// || NODE SEARCHING                 ||
+// ||================================||
 
-//impliment fusejs fuzzy search eventually
-
-var options = {
+var fuseOptions = {
   shouldSort: true,
   threshold: 0.6,
   location: 0,
@@ -136,6 +133,21 @@ var options = {
     "name"
   ]
 };
+
+var currentSelectedNodeId = ""
+
+function highlightNode(nodeId) {
+  nodeId = nodeId.replace("/","_")
+  console.log('#id-' + nodeId)
+  var node = d3.select('#id-' + nodeId)
+  node.attr("class", "nodes selected")
+}
+
+function unhighlightNode(nodeId) {
+  nodeId = nodeId.replace("/","_")
+  var node = d3.select('#id-' + nodeId)
+  node.attr("class", "nodes")
+}
 
 function initSelectBox(nodeList) {
   console.log(nodeList)
@@ -155,9 +167,12 @@ function initSelectBox(nodeList) {
 }
 
 $("#node-search").on("select2:select", function(e) {
-  console.log(e.params.data)
   var nodeData = e.params.data
   highlightNode(nodeData.id)
+  if (currentSelectedNodeId != "") {
+    unhighlightNode(currentSelectedNodeId)
+  }
+    currentSelectedNodeId = nodeData.id
 })
 
 $("#search-button").on("mouseover", function(e) {
