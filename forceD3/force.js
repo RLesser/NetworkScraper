@@ -26,51 +26,14 @@ var firstG = outer
 firstG.append('svg:rect')
     .attr('width', width)
     .attr('height', height)
-    .attr('fill', 'lightblue');
+    .attr('fill', 'white');
 
 var vis = firstG
   .append('svg:g')
-    .on("mousedown", mousedown)
-    .on("wheel", scroll)
-
-var justAfterMouseDown = false
-var justAfterScroll = false
-
-function mousedown() {
-  console.log("mouse down!")
-  justAfterMouseDown = true
-}
-
-function scroll() {
-  console.log("mouse scroll!")
-  justAfterScroll = true
-}
 
 function rescale() {
-  console.log("mousedown?", justAfterMouseDown)
-  // if (justAfterMouseDown) {
-  //   d3.event.transform.x = -1*d3.event.transform.x
-  //   d3.event.transform.y = -1*d3.event.transform.y
-  // }
-  // if (justAfterScroll) {
-  //   d3.event.transform.k = 1/d3.event.transform.k
-  // }
   vis.attr("transform", d3.event.transform)
-  //console.log("new round")
-  //console.log("before:", d3.event.transform)
-  // invTrans = d3.event.transform
-  // invTrans.k = 1/d3.event.transform.k
-  // invTrans.x = -1*d3.event.transform.x
-  // invTrans.y = -1*d3.event.transform.y
-  // console.log("after:", invTrans)
-  //d3.select("rect").attr("transform", d3.event.transform.invert())
-  justAfterMouseDown = false
-  justAfterScroll = false
 }
-
-// var min_zoom = 0.1;
-// var max_zoom = 7;
-// var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom])
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(1).strength(1))
