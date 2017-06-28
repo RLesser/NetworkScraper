@@ -18,43 +18,54 @@ var outer = d3.select("#chart")
     .attr("height", height)
     .attr("pointer-events", "all");
 
-var vis = outer
+var firstG = outer
   .append('svg:g')
     .call(d3.zoom().on("zoom", rescale))
     .on("dblclick.zoom", null)
-  .append('svg:g')
-    .on("mousedown", mouseAction)
-    .on("wheel", mouseAction)
 
-vis.append('svg:rect')
+firstG.append('svg:rect')
     .attr('width', width)
     .attr('height', height)
-    .attr('fill', 'white');
+    .attr('fill', 'lightblue');
 
-// var justAfterMouseDown = false
+var vis = firstG
+  .append('svg:g')
+    .on("mousedown", mousedown)
+    .on("wheel", scroll)
 
-function mouseAction() {
-  // justAfterMouseDown = true
-  return;
+var justAfterMouseDown = false
+var justAfterScroll = false
+
+function mousedown() {
+  console.log("mouse down!")
+  justAfterMouseDown = true
+}
+
+function scroll() {
+  console.log("mouse scroll!")
+  justAfterScroll = true
 }
 
 function rescale() {
-  // console.log("mousedown?", justAfterMouseDown)
+  console.log("mousedown?", justAfterMouseDown)
   // if (justAfterMouseDown) {
-  //   d3.event.transform.k = 1/d3.event.transform.k
   //   d3.event.transform.x = -1*d3.event.transform.x
   //   d3.event.transform.y = -1*d3.event.transform.y
   // }
+  // if (justAfterScroll) {
+  //   d3.event.transform.k = 1/d3.event.transform.k
+  // }
   vis.attr("transform", d3.event.transform)
-  // console.log("new round")
-  // console.log("before:", d3.event.transform)
+  //console.log("new round")
+  //console.log("before:", d3.event.transform)
   // invTrans = d3.event.transform
   // invTrans.k = 1/d3.event.transform.k
   // invTrans.x = -1*d3.event.transform.x
   // invTrans.y = -1*d3.event.transform.y
   // console.log("after:", invTrans)
-  // d3.select("rect").attr("transform", invTrans)
-  // justAfterMouseDown = false
+  //d3.select("rect").attr("transform", d3.event.transform.invert())
+  justAfterMouseDown = false
+  justAfterScroll = false
 }
 
 // var min_zoom = 0.1;
@@ -111,27 +122,15 @@ d3.json("force.json", function(error, graph) {
     .links(graph.links);
 
   function ticked() {
-    if (!graphPaused) {
-      link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+    link
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
 
-      node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-    } else {
-      link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-
-      node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-    }
+    node
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
   }
 });
 
@@ -204,9 +203,7 @@ $("#search-button").on("mouseover", function(e) {
   }, 200, function(){})
   $(".select2").animate({
     opacity: 100
-  }, 200, function(){
-    // $("select").select2("open")
-  })
+  }, 200, function(){})
 })
 
 $("#search").on("mouseleave", function(e) {
