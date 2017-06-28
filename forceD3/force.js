@@ -157,12 +157,25 @@ function initSelectBox(nodeList) {
     o.id = elt.id;
     return o;
   })
-  console.log(results)
+  //todo: get properties that are numeric
+  numProps = nodeList.map(function(elt) {
+    console.log(elt.properties)
+    return elt
+  })
+
+
   $("#node-search").select2({
     placeholder: "Select a node...",
     allowClear: true,
     data: results,
     dropdownParent: $("#search")
+  });
+
+  $("#property-search").select2({
+    placeholder: "Select a numeric property...",
+    allowClear: true,
+    data: results,
+    dropdownParent: $("#sizing")
   });
 }
 
@@ -175,33 +188,36 @@ $("#node-search").on("select2:select", function(e) {
     currentSelectedNodeId = nodeData.id
 })
 
-$("#search-button").on("mouseover", function(e) {
-  $(".select2").css("right", "0px")
-  $("#search").animate({
+$(".left-button").on("mouseover", function(e) {
+  var targetId = e.currentTarget.id.split("-")[0]
+  $("#" + targetId + ">.select2").css("right", "0px")
+  $("#" + targetId).animate({
     right: "40px",
   }, 200, function(){})
-  $(".select2").animate({
+  $("#" + targetId + ">.select2").animate({
     opacity: 100,
   }, 200, function(){})
 })
 
-$("#search").on("mouseleave", function(e) {
-  $("#search").animate({
+$(".left-control").on("mouseleave", function(e) {
+  var targetId = e.currentTarget.id
+  console.log("leaving:", e)
+  $("#" + targetId).animate({
     right: "-160px",
   }, 200, function(){
-    $(".select2").css("right", "-300px")
+    $("#" + targetId + ">.select2").css("right", "-300px")
   })
-  $(".select2").animate({
+  $("#" + targetId + ">.select2").animate({
     opacity: 0,
   }, 200, function(){})
-  $("select").select2("close")
+  $("#" + targetId + ">select").select2("close")
 })
 
 // ||================================||
 // || GRAPH TIME CONTROL             ||
 // ||================================||
 
-$(".button").on("click", function(e) {
+$(".right-button").on("click", function(e) {
   if (e.target.id == "pause-button") {
     $(e.target).css("display", "none")
     $("#play-button").css("display", "initial")
@@ -213,6 +229,9 @@ $(".button").on("click", function(e) {
   }
 })
 
+// ||================================||
+// || NODE SCALING                   ||
+// ||================================||
 
 
 

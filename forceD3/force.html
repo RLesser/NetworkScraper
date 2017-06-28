@@ -12,15 +12,21 @@
   <body>
     <div id="chart">
       <div id="time-control">
-        <img id="play-button" class="button" src="img/play.svg" alt="resume forces">
-        <img id="pause-button" class="button" src="img/pause.svg" alt="pause forces">
+        <img id="play-button" class="right-button" src="img/play.svg" alt="resume forces">
+        <img id="pause-button" class="right-button" src="img/pause.svg" alt="pause forces">
       </div>
-    	<div id="search">
-        <img id="search-button" class="button" src="img/search.svg" alt="search nodes">
-    		<select id="node-search">
+    	<div id="search" class="left-control">
+        <img id="search-button" class="left-button" src="img/search.svg" alt="search nodes">
+    		<select id="node-search" class="left-search">
           <option></option>  
         </select>
     	</div>
+      <div id="sizing" class="left-control">
+        <img id="sizing-button" class="left-button" src="img/target.svg" alt="Size nodes by property">
+        <select id="property-search" class="left-search">
+          <option></option> 
+        </select>
+      </div>
     </div>
     <script type="text/javascript" src="force.js"></script>
   </body>

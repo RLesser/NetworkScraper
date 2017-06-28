@@ -20,7 +20,7 @@ ns = CountyGraph()
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('hypeM_1000')
+ns.loadGraph('github_100')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
