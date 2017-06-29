@@ -68,7 +68,7 @@ d3.json("force.json", function(error, graph) {
     .enter().append("circle")
       .attr("id", function(d) {return ("id-" + d.id).replace("/","_")})
       .attr("class", ".nodes")
-      .attr("r", function(d) {return Math.random()*10})
+      .attr("r", 2)
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -136,33 +136,46 @@ var fuseOptions = {
 
 var currentSelectedNodeId = ""
 
-function highlightNode(nodeId) {
-  nodeId = nodeId.replace("/","_")
-  console.log('#id-' + nodeId)
-  var node = d3.select('#id-' + nodeId)
-  node.attr("class", "nodes selected")
-}
-
-function unhighlightNode(nodeId) {
-  nodeId = nodeId.replace("/","_")
-  var node = d3.select('#id-' + nodeId)
-  node.attr("class", "nodes")
+function getNodeById(nodeId) {
+  var nodeId = nodeId.replace("/","_")
+  return d3.select('#id-' + nodeId)
 }
 
 function initSelectBox(nodeList) {
-  console.log(nodeList)
-  results = nodeList.map(function(elt){
+  var results = nodeList.map(function(elt){
     var o = Object.assign({}, elt);
     o.text = elt.name;
     o.id = elt.id;
     return o;
   })
-  //todo: get properties that are numeric
-  numProps = nodeList.map(function(elt) {
-    console.log(elt.properties)
-    return elt
+  // This relies on the first elt being representative of them all
+  // Todo: Find better way to catagorize in JS or mandate labels in python
+  var props = Object.keys(nodeList[0].properties).filter(function(elt) {
+    return $.isNumeric(nodeList[0].properties[elt])
   })
 
+  var propDict = props.map(function(key) {
+    var propData = {}
+    var max = -Infinity
+    var min = Infinity
+    nodeList.forEach(function(node) {
+      propData[node.id] = node.properties[key]
+      if (node.properties[key] > max) {
+        max = node.properties[key]
+      }
+      if (node.properties[key] < min) {
+        min = node.properties[key]
+      }
+    })
+    var prop = {
+      propData: propData,
+      max: max,
+      min: min,
+      text: key,
+      id: key
+    }
+    return prop
+  })
 
   $("#node-search").select2({
     placeholder: "Select a node...",
@@ -172,20 +185,39 @@ function initSelectBox(nodeList) {
   });
 
   $("#property-search").select2({
-    placeholder: "Select a numeric property...",
+    placeholder: "Select a property...",
     allowClear: true,
-    data: results,
+    data: propDict,
     dropdownParent: $("#sizing")
   });
 }
 
 $("#node-search").on("select2:select", function(e) {
   var nodeData = e.params.data
-  highlightNode(nodeData.id)
+  getNodeById(nodeData.id).attr("class", "nodes selected")
   if (currentSelectedNodeId != "") {
-    unhighlightNode(currentSelectedNodeId)
+    getNodeById(currentSelectedNodeId).attr("class", "nodes")
   }
     currentSelectedNodeId = nodeData.id
+})
+
+$("#property-search").on("select2:select", function(e) {
+  var data = e.params.data
+
+  range1 = [data.min, data.max]
+  squaredRange2 = [1, 25]
+
+  function convertRange( value, r1, r2 ) { 
+    return ( value - r1[0] ) * ( r2[1] - r2[0] ) / ( r1[1] - r1[0] ) + r2[0];
+  }
+
+  for (var key in data.propData) {
+    if (data.propData.hasOwnProperty(key)) {
+      var outputRadius = convertRange(data.propData[key], range1, squaredRange2)
+      getNodeById(key).attr("r", Math.sqrt(outputRadius))
+    }
+  }
+
 })
 
 $(".left-button").on("mouseover", function(e) {
@@ -229,9 +261,6 @@ $(".right-button").on("click", function(e) {
   }
 })
 
-// ||================================||
-// || NODE SCALING                   ||
-// ||================================||
 
 
 
