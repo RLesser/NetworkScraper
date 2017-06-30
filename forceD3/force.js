@@ -218,6 +218,10 @@ function initSelectBox(nodeList) {
     return category
   })
 
+  nonNumericPropDict = nonNumericPropDict.filter(function(elt) {
+    return !(elt == "Invalid Category")
+  })
+
   $("#node-search").select2({
     placeholder: "Select a node...",
     allowClear: true,
