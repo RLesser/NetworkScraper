@@ -62,6 +62,12 @@ html body {
 	top: 100px;
 }
 
+/* Color control */
+
+#coloring {
+	top: 160px;
+}
+
 
 /* Play/Pause CSS */
 #time-control {
