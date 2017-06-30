@@ -12,7 +12,6 @@ html body {
 }
 
 .nodes {
-	fill: lightgrey;
 	stroke: black;
 	stroke-width: .5px;
 }
