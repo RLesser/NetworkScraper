@@ -34,7 +34,7 @@ class WordChange(NetworkScraper):
 		vowels = [l for l in word if l in "aeiou"]
 		propertiesObj["vowels"] = "".join(sorted(vowels))
 		vowelPos = [str(idx) for idx in range(len(word)) if word[idx] in "aeiou"]
-		propertiesObj["vowelPos"] = "".join(vowelPos)
+		propertiesObj["vowelPos"] = "pos-" + "".join(vowelPos)
 
 		return propertiesObj
 

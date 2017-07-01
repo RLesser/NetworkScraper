@@ -49,6 +49,7 @@ d3.json("force.json", function(error, graph) {
   if (error) throw error;
 
   nodeList = graph.nodes
+  console.log(nodeList)
   initSelectBox(nodeList)
 
   var link = vis.append("g")
@@ -64,7 +65,7 @@ d3.json("force.json", function(error, graph) {
     .data(graph.nodes)
     .enter().append("circle")
       .attr("id", function(d) {return ("id-" + d.id).replace("/","_")})
-      .attr("class", ".nodes")
+      .attr("fill", "lightgray")
       .attr("r", 2)
       .call(d3.drag()
           .on("start", dragstarted)
@@ -96,7 +97,7 @@ d3.json("force.json", function(error, graph) {
 
 function dragstarted(d) {
   console.log("drag started on", d)
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  if (!d3.event.active) simulation.alphaTarget(0.3);
   d.fx = d.x;
   d.fy = d.y;
 }
@@ -136,21 +137,9 @@ function getNodeById(nodeId) {
   return d3.select('#id-' + nodeId)
 }
 
-function initSelectBox(nodeList) {
-  var results = nodeList.map(function(elt){
-    var o = Object.assign({}, elt);
-    o.text = elt.name;
-    o.id = elt.id;
-    return o;
-  })
-  // This relies on the first elt being representative of them all
-  // Todo: Find better way to catagorize in JS or mandate labels in python
+function getNumericProperties(nodeList) {
   var numericProps = Object.keys(nodeList[0].properties).filter(function(elt) {
     return $.isNumeric(nodeList[0].properties[elt])
-  })
-
-  var nonNumericProps = Object.keys(nodeList[0].properties).filter(function(elt) {
-    return !$.isNumeric(nodeList[0].properties[elt])
   })
 
   var numericPropDict = numericProps.map(function(key) {
@@ -174,6 +163,14 @@ function initSelectBox(nodeList) {
       id: key
     }
     return prop
+  })
+
+  return numericPropDict
+}
+
+function getCategoricalProperties(nodeList) {
+  var nonNumericProps = Object.keys(nodeList[0].properties).filter(function(elt) {
+    return !$.isNumeric(nodeList[0].properties[elt])
   })
 
   // Get object with keys as nodes and values as category value
@@ -222,6 +219,25 @@ function initSelectBox(nodeList) {
     return !(elt == "Invalid Category")
   })
 
+  return nonNumericPropDict
+}
+
+function initSelectBox(nodeList) {
+  var results = nodeList.map(function(elt){
+    var o = Object.assign({}, elt);
+    o.text = elt.name;
+    o.id = elt.id;
+    return o;
+  })
+
+  console.log(nodeList)
+
+  var numericData = getNumericProperties(nodeList)
+
+  // Note: numeric properties that are to be treated categorically must be strings, not numbers
+  var categoricalData = getCategoricalProperties(nodeList)
+
+
   $("#node-search").select2({
     placeholder: "Select a node...",
     allowClear: true,
@@ -232,14 +248,14 @@ function initSelectBox(nodeList) {
   $("#property-search").select2({
     placeholder: "Select a property...",
     allowClear: true,
-    data: numericPropDict,
+    data: numericData,
     dropdownParent: $("#sizing")
   });
 
   $("#category-search").select2({
     placeholder: "Select a category...",
     allowClear: true,
-    data: nonNumericPropDict,
+    data: categoricalData,
     dropdownParent: $("#coloring")
   });
 }

@@ -8,19 +8,20 @@ from ghScrape import GithubNetwork
 from wordGraph import WordChange
 from countyGraph import CountyGraph
 
-ns = CountyGraph()
+ns = WordChange()
+# ns.propegateGraph('word', verbose = True)
 #ns.propegateGraph('RLesser', save_interval_and_location = [100, 'github_1000'], limit = 1000, verbose = True)
 # ns.propegateGraph('36119', verbose = True)
 # 'hypeM_all' killed after 18114 by /danivachon/ -> /Radio/
 
 # ns.propegateGraph(10003215, verbose = True)
-# ns.saveGraph('adjwords_3')
+# ns.saveGraph('adjwords_4')
 # ns.loadGraph('github_1000')
 # ns.colorNodes(keyProperty = "customName")
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('hypeM_1000')
+#ns.loadGraph('adjwords_3')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
