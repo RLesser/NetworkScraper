@@ -48,6 +48,7 @@ var graphPaused = false
 d3.json("force.json", function(error, graph) {
   if (error) throw error;
 
+  console.log(graph)
   nodeList = graph.nodes
   console.log(nodeList)
   initSelectBox(nodeList)
@@ -230,12 +231,18 @@ function initSelectBox(nodeList) {
     return o;
   })
 
-  console.log(nodeList)
+  if (nodeList.hasOwnProperty("properties")) {
+    var numericData = getNumericProperties(nodeList)
 
-  var numericData = getNumericProperties(nodeList)
-
-  // Note: numeric properties that are to be treated categorically must be strings, not numbers
-  var categoricalData = getCategoricalProperties(nodeList)
+    // Note: numeric properties that are to be treated categorically must be strings, not numbers
+    var categoricalData = getCategoricalProperties(nodeList)
+  } else {
+    var numericData = categoricalData = {
+      text: "No Properties Found",
+      selectable: false
+    }
+  }
+  
 
 
   $("#node-search").select2({
@@ -290,10 +297,10 @@ $("#property-search").on("select2:select", function(e) {
 $("#category-search").on("select2:select", function(e) {
   var data = e.params.data
 
-  console.log(data)
-
   for (var key in data.catData) {
-    getNodeById(key).attr("fill", data.catData[key])
+    if (data.catData.hasOwnProperty(key)) {
+      getNodeById(key).attr("fill", data.catData[key])    
+    }
   }
 })
 
