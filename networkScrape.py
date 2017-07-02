@@ -227,12 +227,16 @@ class NetworkScraper(object):
 
 		# Decision:
 		# Only allow removeBuds and filterEdges, have removeOphans as part of filterEdges
+		oldGraphDict = graphDict
 
 		if self.filter_assym_edges:
 			graphDict = self.filterUnreciprocatedEdges(graphDict)
 			graphDict = self.removeOrphanNodes(graphDict)
 
-		#print graphDict
+		if oldGraphDict != {} and graphDict == {}:
+			raise ValueError("Current data is oriented graph, so filtering assymmetric edges removes entire graph")
+
+		print graphDict
 		if mode == 'networkx':
 			nxGraph = nx.Graph(graphDict)
 			for node in self.exploreList:
@@ -268,6 +272,7 @@ class NetworkScraper(object):
 				"nodes" : nodeList,
 				"links" : linkList
 			}
+			print "graphObj:", graphObj
 			return graphObj
 			#print graphDict
 
@@ -349,7 +354,7 @@ class NetworkScraper(object):
 		self.buds_visible = buds_visible
 		self.filter_assym_edges = filter_assym_edges
 		G = self.makeGraphData(mode = "d3")
-		# print G
+		print G
 		if hasattr(self, 'nodeColorInfo'):
 			G = self.useColorData(G, "d3")
 		# for item in adjList:

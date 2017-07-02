@@ -48,7 +48,6 @@ var graphPaused = false
 d3.json("force.json", function(error, graph) {
   if (error) throw error;
 
-  console.log(graph)
   nodeList = graph.nodes
   console.log(nodeList)
   initSelectBox(nodeList)
@@ -97,7 +96,6 @@ d3.json("force.json", function(error, graph) {
 });
 
 function dragstarted(d) {
-  console.log("drag started on", d)
   if (!d3.event.active) simulation.alphaTarget(0.3);
   d.fx = d.x;
   d.fy = d.y;
@@ -231,7 +229,8 @@ function initSelectBox(nodeList) {
     return o;
   })
 
-  if (nodeList.hasOwnProperty("properties")) {
+  console.log(nodeList)
+  if (nodeList[0].hasOwnProperty("properties")) {
     var numericData = getNumericProperties(nodeList)
 
     // Note: numeric properties that are to be treated categorically must be strings, not numbers

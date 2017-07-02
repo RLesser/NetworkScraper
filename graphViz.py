@@ -21,7 +21,7 @@ ns = WordChange()
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('emerald_all_flags')
+ns.loadGraph('collatz_1000')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
