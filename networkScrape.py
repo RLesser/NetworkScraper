@@ -83,10 +83,10 @@ class NetworkScraper(object):
 									 "View the docstring for more info on implimentation")
 
 
-	def makeEdgeObject(self, nodeId, edgeVisible = True):
+	def makeEdgeObject(self, nodeId, propertyDict = {}):
 		edge = {
 			'nodeId': nodeId,
-			'edgeVisible': edgeVisible
+			'properties': propertyDict
 		}
 		return edge
 
@@ -174,8 +174,7 @@ class NetworkScraper(object):
 				#print node['nodeId']
 				# uncomment list comprehension once logic fixed
 				adjNodes = [edge['nodeId'] for edge in node['edges'] \
-							if edge['edgeVisible'] and \
-							(not isBud(edge['nodeId']) or self.buds_visible)]
+							if (not isBud(edge['nodeId'])) or self.buds_visible]
 
 			else:
 				# possible to have non-bud (aka explored) node w/o adjNodes
