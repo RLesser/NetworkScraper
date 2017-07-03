@@ -8,7 +8,11 @@ from ghScrape import GithubNetwork
 from wordGraph import WordChange
 from countyGraph import CountyGraph
 
-ns = WordChange()
+ns = ppfNetwork()
+
+# ns.setOcean("meridian")
+# ns.propegateGraph("10003215", verbose = True)
+# ns.saveGraph("meridian_all_flags")
 # ns.propegateGraph('word', verbose = True)
 #ns.propegateGraph('RLesser', save_interval_and_location = [100, 'github_1000'], limit = 1000, verbose = True)
 # ns.propegateGraph('36119', verbose = True)
@@ -21,8 +25,8 @@ ns = WordChange()
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('github_100')
+ns.loadGraph('meridian_all_flags')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
-ns.graphD3(buds_visible = False, filter_assym_edges = False)
+ns.graphD3(buds_visible = False, filter_assym_edges = True)
