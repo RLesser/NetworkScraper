@@ -21,8 +21,8 @@ ns = WordChange()
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('collatz_1000')
+ns.loadGraph('github_100')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
-ns.graphD3(buds_visible = False, filter_assym_edges = True)
+ns.graphD3(buds_visible = False, filter_assym_edges = False)

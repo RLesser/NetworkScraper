@@ -12,11 +12,6 @@ import SimpleHTTPServer
 import datetime
 
 
-class UndefinedFunctionError(Exception):
-	pass
-
-
-
 class NetworkScraper(object):
 	"""base class for scraping websites for network connections"""
 	def __init__(self):
@@ -25,7 +20,6 @@ class NetworkScraper(object):
 		self.exploreList = []
 		# relationDict has the nodeId's as keys
 		# self.relationDict = {}
-
 
 
 
@@ -75,7 +69,7 @@ class NetworkScraper(object):
 
 	### FUNCTIONS TO BE DEFINED IN SUBCLASSES ###
 	def getDataSource(self, nodeId):
-		raise UndefinedFunctionError("getDataSource must be defined in a subclass. "
+		raise NotImplementedError("getDataSource must be defined in a subclass. "
 									 "View the docstring for more info on implimentation")
 
 
@@ -85,7 +79,7 @@ class NetworkScraper(object):
 
 
 	def getEdgeData(self, data):
-		raise UndefinedFunctionError("getEdgeData must be defined in a subclass. "
+		raise NotImplementedError("getEdgeData must be defined in a subclass. "
 									 "View the docstring for more info on implimentation")
 
 
@@ -109,7 +103,6 @@ class NetworkScraper(object):
 		node = {
 			'name': None,
 			'nodeId': nodeId,
-			'nodeColor': None,
 			'edges': [],
 			'properties': {}
 		}
@@ -167,6 +160,7 @@ class NetworkScraper(object):
 	### GRAPH COMPILATION AND ASSOCIATED FUNCTIONS ###
 	def createGraphDict(self):
 		graphDict = {}
+		print self.exploreList
 		#setting the graph dict with keys being the nodes and vals being connections
 		for nodeIdx in range(len(self.exploreList)):
 			#print self.exploreList
@@ -228,6 +222,8 @@ class NetworkScraper(object):
 		# Decision:
 		# Only allow removeBuds and filterEdges, have removeOphans as part of filterEdges
 		oldGraphDict = graphDict
+
+		print graphDict
 
 		if self.filter_assym_edges:
 			graphDict = self.filterUnreciprocatedEdges(graphDict)
