@@ -11,6 +11,9 @@ var selected_node = null,
     mousedown_node = null,
     mouseup_node = null;
 
+var defaultRadius = 2,
+    defaultColor = "lightgray"
+
 var outer = d3.select("#chart")
   .append("svg:svg")
     .attr("width", width)
@@ -43,8 +46,6 @@ var simulation = d3.forceSimulation()
 
 var nodeList = []
 
-var graphPaused = false
-
 d3.json("force.json", function(error, graph) {
   if (error) throw error;
 
@@ -65,8 +66,11 @@ d3.json("force.json", function(error, graph) {
     .data(graph.nodes)
     .enter().append("circle")
       .attr("id", function(d) {return ("id-" + d.id).replace("/","_")})
-      .attr("fill", "lightgray")
-      .attr("r", 2)
+      .attr("fill", defaultColor)
+      .attr("r", defaultRadius)
+      .attr("size", "")
+      .attr("category", "")
+      .attr("name", function(d) { return d.name })
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -113,7 +117,7 @@ function dragended(d) {
 }
 
 // ||================================||
-// || NODE SEARCHING                 ||
+// || NODE SEARCHING AND ALTERING    ||
 // ||================================||
 
 var fuseOptions = {
@@ -134,6 +138,20 @@ var currentSelectedNodeId = ""
 function getNodeById(nodeId) {
   var nodeId = nodeId.replace("/","_")
   return d3.select('#id-' + nodeId)
+}
+
+function setNodeTitle(nodeObj) {
+  var size = nodeObj.attr("size")
+  var category = nodeObj.attr("category")
+  var name = nodeObj.attr("name")
+  var titleStr = name
+  if (size != "") {
+    titleStr += " [" + size + "]"
+  }
+  if (category != "") {
+    titleStr += " - " + category
+  }
+  nodeObj.select("title").text(titleStr)
 }
 
 function getNumericProperties(nodeList) {
@@ -207,6 +225,7 @@ function getCategoricalProperties(nodeList) {
         
     var category = {
       catData: nodeIdToColor,
+      catName: propData, 
       text: key,
       id: key
     }
@@ -275,11 +294,15 @@ $("#node-search").on("select2:select", function(e) {
     currentSelectedNodeId = nodeData.id
 })
 
+$("#node-search").on("select2:unselect", function(e) {
+  getNodeById(currentSelectedNodeId).attr("class", "nodes")
+})
+
 $("#property-search").on("select2:select", function(e) {
   var data = e.params.data
 
   range1 = [data.min, data.max]
-  squaredRange2 = [1, 25]
+  squaredRange2 = [4, 36]
 
   function convertRange( value, r1, r2 ) { 
     return ( value - r1[0] ) * ( r2[1] - r2[0] ) / ( r1[1] - r1[0] ) + r2[0];
@@ -289,6 +312,18 @@ $("#property-search").on("select2:select", function(e) {
     if (data.propData.hasOwnProperty(key)) {
       var outputRadius = convertRange(data.propData[key], range1, squaredRange2)
       getNodeById(key).attr("r", Math.sqrt(outputRadius))
+      getNodeById(key).attr("size", data.propData[key])
+      setNodeTitle(getNodeById(key))
+    }
+  }
+})
+
+$("#property-search").on("select2:unselect", function(e) {
+  for (var key in e.params.data.propData) {
+    if (e.params.data.propData.hasOwnProperty(key)) {
+      getNodeById(key).attr("r", defaultRadius)
+      getNodeById(key).attr("size", "")
+      setNodeTitle(getNodeById(key))
     }
   }
 })
@@ -298,7 +333,19 @@ $("#category-search").on("select2:select", function(e) {
 
   for (var key in data.catData) {
     if (data.catData.hasOwnProperty(key)) {
-      getNodeById(key).attr("fill", data.catData[key])    
+      getNodeById(key).attr("fill", data.catData[key])   
+      getNodeById(key).attr("category", data.catName[key])
+      setNodeTitle(getNodeById(key)) 
+    }
+  }
+})
+
+$("#category-search").on("select2:unselect", function(e) {
+  for (var key in e.params.data.catData) {
+    if (e.params.data.catData.hasOwnProperty(key)) {
+      getNodeById(key).attr("fill", defaultColor)
+      getNodeById(key).attr("category", "")
+      setNodeTitle(getNodeById(key)) 
     }
   }
 })
