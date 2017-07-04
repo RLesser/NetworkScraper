@@ -63,7 +63,7 @@ class ppfNetwork(NetworkScraper):
 
 		for item in flagLinks[0].parent:
 			if item != "\n" and item.name != "br":
-				if item.text == "At war with:":
+				if item.text == "At war with:" or item.text == "Offering a truce to:":
 					currentType = "war"
 				elif item.text == "Allied with:":
 					currentType = "ally"

@@ -10,8 +10,8 @@ from countyGraph import CountyGraph
 
 ns = ppfNetwork()
 
-# ns.setOcean("meridian")
-# ns.propegateGraph("10003215", verbose = True)
+ns.setOcean("cerulean")
+ns.propegateGraph("10008456", verbose = True)
 # ns.saveGraph("meridian_all_flags")
 # ns.propegateGraph('word', verbose = True)
 #ns.propegateGraph('RLesser', save_interval_and_location = [100, 'github_1000'], limit = 1000, verbose = True)
@@ -25,7 +25,8 @@ ns = ppfNetwork()
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.loadGraph('meridian_all_flags')
+ns.saveGraph('cerulean_all_flags')
+ns.loadGraph('cerulean_all_flags')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
