@@ -65,7 +65,7 @@ d3.json("force.json", function(error, graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("id", function(d) {return ("id-" + d.id).replace("/","_")})
+      .attr("idValue", function(d) {return d.id})
       .attr("fill", defaultColor)
       .attr("r", defaultRadius)
       .attr("size", "")
@@ -136,8 +136,7 @@ var fuseOptions = {
 var currentSelectedNodeId = ""
 
 function getNodeById(nodeId) {
-  var nodeId = nodeId.replace("/","_")
-  return d3.select('#id-' + nodeId)
+  return d3.select('[idValue="' + nodeId + '"]')
 }
 
 function setNodeTitle(nodeObj) {
@@ -313,6 +312,7 @@ $("#property-search").on("select2:select", function(e) {
       var outputRadius = convertRange(data.propData[key], range1, squaredRange2)
       getNodeById(key).attr("r", Math.sqrt(outputRadius))
       getNodeById(key).attr("size", data.propData[key])
+      console.log("key:", key)
       setNodeTitle(getNodeById(key))
     }
   }
@@ -323,6 +323,7 @@ $("#property-search").on("select2:unselect", function(e) {
     if (e.params.data.propData.hasOwnProperty(key)) {
       getNodeById(key).attr("r", defaultRadius)
       getNodeById(key).attr("size", "")
+      console.log("key:", key)
       setNodeTitle(getNodeById(key))
     }
   }
