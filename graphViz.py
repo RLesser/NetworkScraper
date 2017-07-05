@@ -7,11 +7,11 @@ from collatzGraph import CollatzGraph
 from ghScrape import GithubNetwork
 from wordGraph import WordChange
 from countyGraph import CountyGraph
+from artistScrape import ArtistNetwork
 
-ns = ppfNetwork()
+ns = ArtistNetwork()
 
-ns.setOcean("cerulean")
-ns.propegateGraph("10008456", verbose = True)
+ns.propegateGraph("Kanye_West", limit = 100, verbose = True)
 # ns.saveGraph("meridian_all_flags")
 # ns.propegateGraph('word', verbose = True)
 #ns.propegateGraph('RLesser', save_interval_and_location = [100, 'github_1000'], limit = 1000, verbose = True)
@@ -25,9 +25,9 @@ ns.propegateGraph("10008456", verbose = True)
 # ns.graphNetworkx(buds_visible = True, labels_visible = False, iterations = 100)
 # time.sleep(5)
 
-ns.saveGraph('cerulean_all_flags')
-ns.loadGraph('cerulean_all_flags')
+# ns.saveGraph('cerulean_all_flags')
+# ns.loadGraph('cerulean_all_flags')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
-ns.graphD3(buds_visible = False, filter_assym_edges = True)
+ns.graphD3(buds_visible = False, filter_assym_edges = False)
