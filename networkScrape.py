@@ -10,6 +10,7 @@ import os
 import json
 import SimpleHTTPServer
 import datetime
+import time
 
 
 class NetworkScraper(object):
@@ -25,10 +26,18 @@ class NetworkScraper(object):
 
 	### GENERAL UTILITY FUNCTIONS ###
 	def url_to_soup(self, url):
-	    req = urllib2.Request(url, headers={ 'User-Agent': 'Mozilla/5.0' })
-	    html = urllib2.urlopen(req).read()
-	    soup = bs4.BeautifulSoup(html)
-	    return soup
+		req = urllib2.Request(url, headers={ 'User-Agent': 'Mozilla/5.0' })
+		timeDelay = 1
+		while True:
+			try:
+				html = urllib2.urlopen(req).read()
+				break
+			except:
+				print "ERROR IN WEBSITE REQUEST, RETRYING IN", timeDelay, "SECOND(S)"
+				time.sleep(timeDelay)
+				timeDelay *= 10
+		soup = bs4.BeautifulSoup(html)
+		return soup
 
 
 	def saveGraph(self, graphName, path = "./savedData/"):
