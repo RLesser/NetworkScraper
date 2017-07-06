@@ -354,7 +354,7 @@ $("#category-search").on("select2:unselect", function(e) {
 
 $(".left-button").on("mouseover", function(e) {
   var targetId = e.currentTarget.id.split("-")[0]
-  $("#" + targetId + ">.select2").css("right", "0px")
+  $("#" + targetId + ">.select2").css("pointer-events", "initial")
   $("#" + targetId).animate({
     right: "40px",
   }, 200, function(){})
@@ -365,12 +365,10 @@ $(".left-button").on("mouseover", function(e) {
 
 $(".left-control").on("mouseleave", function(e) {
   var targetId = e.currentTarget.id
-  console.log("leaving:", e)
+  $("#" + targetId + ">.select2").css("pointer-events", "none")
   $("#" + targetId).animate({
     right: "-160px",
-  }, 200, function(){
-    $("#" + targetId + ">.select2").css("right", "-300px")
-  })
+  }, 200, function(){})
   $("#" + targetId + ">.select2").animate({
     opacity: 0,
   }, 200, function(){})

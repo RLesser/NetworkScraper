@@ -7,11 +7,11 @@ from collatzGraph import CollatzGraph
 from ghScrape import GithubNetwork
 from wordGraph import WordChange
 from countyGraph import CountyGraph
-from artistScrape import ArtistNetwork
+from lastFMScrape import ArtistNetwork, TagNetwork
 
-ns = ArtistNetwork()
+ns = TagNetwork()
 
-# ns.propegateGraph("Young+Thug", save_interval_and_location = [20, 'lfm_all'], verbose = True)
+# ns.propegateGraph("Hip-hop", save_interval_and_location = [100, 'lfm_tags_all'], verbose = True)
 # ns.saveGraph("meridian_all_flags")
 # ns.propegateGraph('word', verbose = True)
 #ns.propegateGraph('RLesser', save_interval_and_location = [100, 'github_1000'], limit = 1000, verbose = True)
@@ -26,7 +26,7 @@ ns = ArtistNetwork()
 # time.sleep(5)
 
 # ns.saveGraph('cerulean_all_flags')
-ns.loadGraph('lfm_all')
+ns.loadGraph('lfm_100')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
