@@ -23,6 +23,8 @@ class ArtistNetwork(NetworkScraper):
 
 	def getEdgeData(self, data):
 		relatedList = data.find_all("ol", class_ = "grid-items")[-1]
+		if relatedList.find(itemprop = "album") != None:
+			return []
 		links = relatedList.find_all("a", class_ = "link-block-cover-link")
 		ids = [self.convertFromURL(link["href"].replace("/music/","")) for link in links]
 		edgeObjs = [self.makeEdgeObject(nodeId) for nodeId in ids]

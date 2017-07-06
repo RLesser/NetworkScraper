@@ -11,7 +11,7 @@ from artistScrape import ArtistNetwork
 
 ns = ArtistNetwork()
 
-ns.propegateGraph("Young+Thug", save_interval_and_location = [50, 'lfm_1000'], limit = 1000, verbose = True)
+# ns.propegateGraph("Young+Thug", save_interval_and_location = [20, 'lfm_all'], verbose = True)
 # ns.saveGraph("meridian_all_flags")
 # ns.propegateGraph('word', verbose = True)
 #ns.propegateGraph('RLesser', save_interval_and_location = [100, 'github_1000'], limit = 1000, verbose = True)
@@ -26,7 +26,7 @@ ns.propegateGraph("Young+Thug", save_interval_and_location = [50, 'lfm_1000'], l
 # time.sleep(5)
 
 # ns.saveGraph('cerulean_all_flags')
-# ns.loadGraph('cerulean_all_flags')
+ns.loadGraph('lfm_all')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 
