@@ -5,6 +5,14 @@ html body {
 	overflow: hidden;
 }
 
+select {
+	opacity: 0;
+}
+
+.hidden {
+	opacity: 0;
+	pointer-events: none;
+}
 
 /* Graph CSS */
 #chart {
@@ -105,6 +113,7 @@ html body {
 	left: 40px;
 	border: 2px solid black;
 	border-radius: 6px;
+	overflow: scroll;
 }
 
 .legend-bar {
@@ -124,6 +133,11 @@ html body {
 	margin: 2px;
 	float: left;
 	display: none;
+}
+
+.legend-content {
+	background-color: blue;
+	height: 220px;
 }
 
 #coloring-legend {

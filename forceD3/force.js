@@ -335,7 +335,12 @@ $("#property-search").on("select2:unselect", function(e) {
 
 $("#category-search").on("select2:select", function(e) {
   var data = e.params.data
-
+  // a little hacky but alright
+  $.when(
+    $("#coloring-legend").css("height","20px")
+  ).done(function() {
+    $("#coloring-legend").removeClass("hidden")
+  })
   for (var key in data.catData) {
     if (data.catData.hasOwnProperty(key)) {
       getNodeById(key).attr("fill", data.catData[key])   
@@ -346,6 +351,7 @@ $("#category-search").on("select2:select", function(e) {
 })
 
 $("#category-search").on("select2:unselect", function(e) {
+  $("#coloring-legend").addClass("hidden")
   for (var key in e.params.data.catData) {
     if (e.params.data.catData.hasOwnProperty(key)) {
       getNodeById(key).attr("fill", defaultColor)
