@@ -117,7 +117,7 @@ function dragended(d) {
 }
 
 // ||================================||
-// || NODE SEARCHING AND ALTERING    ||
+// || INITIALIZATION FUNCTIONS       ||
 // ||================================||
 
 var fuseOptions = {
@@ -284,6 +284,10 @@ function initSelectBox(nodeList) {
   });
 }
 
+// ||================================||
+// || NODE CONTROL INTERACTION       ||
+// ||================================||
+
 $("#node-search").on("select2:select", function(e) {
   var nodeData = e.params.data
   getNodeById(nodeData.id).attr("class", "nodes selected")
@@ -390,6 +394,41 @@ $(".right-button").on("click", function(e) {
     simulation.restart()
   }
 })
+
+// ||================================||
+// || NODE LEGEND CONTROL            ||
+// ||================================||
+
+$(".bottom-legend").on("mouseover", function(e) {
+  var targetId = e.currentTarget.id.split("-")[0]
+  $("#" + targetId + "-legend").animate({
+    width: "160px",
+  }, 200, function(){})
+})
+
+$(".bottom-legend").on("mouseleave", function(e) {
+  var targetId = e.currentTarget.id.split("-")[0]
+  $("#" + targetId + "-legend").animate({
+    width: "20px",
+  }, 200, function(){})
+})
+
+$(".bottom-legend").hover(function(e) {
+  var targetId = e.currentTarget.id.split("-")[0]
+  $(this).stop(true).animate({
+    width: "160px"
+  }, 200, function() {})
+}, function(e) {
+  var targetId = e.currentTarget.id.split("-")[0]
+  $(this).stop(true).animate({
+    width: "20px"
+  }, 200, function() {})
+})
+
+
+
+
+
 
 
 //Color list from here: https://jnnnnn.blogspot.com.au/2017/02/distinct-colours-2.html
