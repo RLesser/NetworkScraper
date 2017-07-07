@@ -438,6 +438,9 @@ $(".legend-bar").click(function(e) {
       console.log("test")
       $(this).children(".legend-bar").removeClass("click-anim")
     })
+    $(this).parent().children(".legend-content").animate({
+      height: "220px"
+    }, 200, function() {})
   } else {
     $(this).removeClass("expanded")
     $.when($("#legend-retract").fadeOut(50)).done(function() {
@@ -453,6 +456,9 @@ $(".legend-bar").click(function(e) {
         $(this).children(".legend-bar").removeClass("click-anim")
       })
     })
+    $(this).parent().children(".legend-content").animate({
+      height: "0px"
+    }, 200, function() {})
   }
 })
 
