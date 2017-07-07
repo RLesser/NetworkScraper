@@ -399,30 +399,55 @@ $(".right-button").on("click", function(e) {
 // || NODE LEGEND CONTROL            ||
 // ||================================||
 
-$(".bottom-legend").on("mouseover", function(e) {
-  var targetId = e.currentTarget.id.split("-")[0]
-  $("#" + targetId + "-legend").animate({
-    width: "160px",
-  }, 200, function(){})
-})
-
-$(".bottom-legend").on("mouseleave", function(e) {
-  var targetId = e.currentTarget.id.split("-")[0]
-  $("#" + targetId + "-legend").animate({
-    width: "20px",
-  }, 200, function(){})
-})
-
 $(".bottom-legend").hover(function(e) {
-  var targetId = e.currentTarget.id.split("-")[0]
-  $(this).stop(true).animate({
-    width: "160px"
-  }, 200, function() {})
+  if (!$(this).children(".legend-bar").hasClass("click-anim")) {
+    $(this).stop(true).animate({
+      width: "160px"
+    }, 200, function() {
+      if (!$(this).children(".legend-bar").hasClass("expanded")) {
+        $("#legend-expand").fadeIn(50)
+      }
+    })
+  }
 }, function(e) {
-  var targetId = e.currentTarget.id.split("-")[0]
-  $(this).stop(true).animate({
-    width: "20px"
-  }, 200, function() {})
+  if (!$(this).children(".legend-bar").hasClass("expanded") &&
+      !$(this).children(".legend-bar").hasClass("click-anim")) {
+    $(this).stop(true).animate({
+      width: "20px"
+    }, 200, function() {})
+    $("#legend-expand").fadeOut(50)
+  }
+})
+
+$(".legend-bar").click(function(e) {
+  $(this).addClass("click-anim")
+  if (!$(this).hasClass("expanded")) {
+    $(this).addClass("expanded")
+    $.when($("#legend-expand").fadeOut(50)).done(function() {
+      $("#legend-retract").fadeIn(50)    
+    })
+    $(this).parent().stop(true).animate({
+      height: "240px"
+    }, 200, function() {
+      console.log("test")
+      $(this).children(".legend-bar").removeClass("click-anim")
+    })
+  } else {
+    $(this).removeClass("expanded")
+    $.when($("#legend-retract").fadeOut(50)).done(function() {
+      $("#legend-expand").fadeIn(50)    
+    })
+    $(this).parent().animate({
+      height: "20px"
+    }, 200, function() {
+      $("#legend-expand").fadeOut(50)
+      $(this).animate({
+        width: "20px"
+      }, 200, function() {
+        $(this).children(".legend-bar").removeClass("click-anim")
+      })
+    })
+  }
 })
 
 

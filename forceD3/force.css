@@ -98,23 +98,34 @@ html body {
 }
 
 
-/*sizing legend*/
+/*categoy legend*/
 .bottom-legend {
 	position: absolute;
 	bottom: 20px;
 	left: 40px;
-	width: 20px;
-	height: 20px;
 	border: 2px solid black;
 	border-radius: 6px;
 }
 
-#sizing-legend {
+.legend-bar {
+	width: 100%;
+	height: 20px;
+	cursor: pointer;
+}
+
+.legend-icon {
+	width: 16px;
+	margin: 2px;
+	float: right;
+}
+
+.legend-control {
+	width: 16px;
+	margin: 2px;
+	float: left;
+	display: none;
+}
+
+#coloring-legend {
 	left: 40px;
 }
-
-/*coloring legend*/
-#coloring-legend {
-	left: 240px;
-}
-
