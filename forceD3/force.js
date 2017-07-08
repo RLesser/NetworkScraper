@@ -422,6 +422,7 @@ var populateLegend = function(category) {
   var contentDiv = $("#coloring-legend>.legend-content")
   contentDiv.html("")
   var categoryData = categorySortedLists[category]
+  var colorIdx = 0
   categoryData.forEach(function(elt) {
     eltDiv = '<div class="legend-elt"></div>'
     contentDiv.append(eltDiv)
@@ -429,6 +430,8 @@ var populateLegend = function(category) {
     valueName = '<div class="legend-value-name">' + elt[0] + '</div>'
     contentDiv.children().last().append(colorNum)
     contentDiv.children().last().append(valueName)
+    contentDiv.children().last().children(".legend-color-num").css("background-color", COLOR_LIST[colorIdx])
+    colorIdx += 1
   })
 }
 

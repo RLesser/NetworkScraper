@@ -143,21 +143,31 @@ select {
 }
 
 .legend-elt {
-	margin: 2px;
+	padding: 1px;
 	display: block;
 	overflow: auto;
 }
 
+.legend-elt:hover {
+	background-color: lightgray;
+}
+
 .legend-color-num {
-	background-color: lightblue;
-	width: 30%;
+	background-color: lightgreen;
+	width: 20%;
 	float: left;
+	border-radius: 4px;
+	text-align: right;
+	padding-right: 4px;
 }
 
 .legend-value-name {
-	width: 70%;
+	width: 74%;
 	float: right;
-	font-size: 10pt;
+	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+  	padding-left: 4px;
 }
 
 #coloring-legend {
