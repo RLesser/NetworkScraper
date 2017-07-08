@@ -30,6 +30,10 @@ select {
 	stroke-width: 1px;
 }
 
+.faded-node {
+	opacity: 0.2;
+}
+
 .links line {
 	stroke: #555;
 	stroke-opacity: .4;
@@ -150,6 +154,10 @@ select {
 
 .legend-elt:hover {
 	background-color: lightgray;
+}
+
+.selected-elt {
+	background-color: lightblue;
 }
 
 .legend-color-num {

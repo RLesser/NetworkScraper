@@ -139,6 +139,10 @@ function getNodeById(nodeId) {
   return d3.select('#' + $.escapeSelector(nodeId))
 }
 
+function getAllNodes() {
+  return $(".nodes").children()
+}
+
 function setNodeTitle(nodeObj) {
   var size = nodeObj.attr("size")
   var category = nodeObj.attr("category")
@@ -448,6 +452,30 @@ var populateLegend = function(category) {
   })
 }
 
+var fadeNode = function(mode, valuesToAffect, exceptions) {
+  var action = ""
+  if (mode == "fade") {
+    action = function(node) { node.addClass("faded-node") }
+  } else {
+    action = function(node) { node.removeClass("faded-node") }
+  }
+
+  console.log(valuesToAffect, exceptions)
+  $.each(getAllNodes(), function(nodeIdx, nodeVal) {
+    var node = $(nodeVal)
+    console.log(node.attr("category"))
+    if (valuesToAffect == "all") {
+      if ($.inArray(node.attr("category"), exceptions)) {
+        console.log(mode, "all")
+        action(node)
+      }
+    } else if (!$.inArray(node.attr("category"), valuesToAffect)) {
+      console.log(mode, "specifically")
+      action(node)
+    }
+  })
+}
+
 
 $(".bottom-legend").hover(function(e) {
   if (!$(this).children(".legend-bar").hasClass("click-anim")) {
@@ -505,6 +533,30 @@ $(".legend-bar").click(function(e) {
   }
 })
 
+$(".legend-content").on("click", ".legend-elt", function(e) {
+  $(this).toggleClass("selected-elt")
+  var currentCategory = $(this).children(".legend-value-name").text()
+  if ($(this).hasClass("selected-elt")) {
+    $(this).parent().attr("num-selected", 
+                          function(i, oldval) { return parseInt(oldval, 10) + 1})
+    if ($(this).parent().attr("num-selected") == 1) {
+      console.log("only one selected")
+      fadeNode("fade", "all", [$.trim(currentCategory)])
+    } else {
+      fadeNode("unfade", [$.trim(currentCategory)], [])
+    }
+
+  } else {
+    $(this).parent().attr("num-selected", 
+                          function(i, oldval) { return parseInt(oldval, 10) - 1})
+    if ($(this).parent().attr("num-selected") == 0) {
+      console.log("zero selected")
+      fadeNode("unfade", "all", [])
+    } else {
+      fadeNode("fade", [$.trim(currentCategory)], [])
+    }
+  }
+})
 
 
 
