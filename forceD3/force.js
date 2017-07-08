@@ -184,6 +184,8 @@ function getNumericProperties(nodeList) {
   return numericPropDict
 }
 
+var categorySortedLists = {}
+
 function getCategoricalProperties(nodeList) {
   var nonNumericProps = Object.keys(nodeList[0].properties).filter(function(elt) {
     return !$.isNumeric(nodeList[0].properties[elt])
@@ -209,10 +211,16 @@ function getCategoricalProperties(nodeList) {
       return -(countKeeper[a] - countKeeper[b])
     })
 
+    var sortedPairs = sortedList.map(function(key) {
+      return [key, countKeeper[key]]
+    })
+
     // If more than a third of nodes are unique categories, invalid category
     if (sortedList.length * 3 >= nodeList.length) {
       return "Invalid Category"
     }
+
+    categorySortedLists[key] = sortedPairs
 
     // for each node, find the index of value in the sorted list, get corresponding color
 
@@ -221,7 +229,9 @@ function getCategoricalProperties(nodeList) {
       color = COLOR_LIST[sortedList.indexOf(propData[nodeId].toString())]
       nodeIdToColor[nodeId] = color
     }
-        
+    
+    console.log(nodeIdToColor)    
+
     var category = {
       catData: nodeIdToColor,
       catName: propData, 
@@ -337,10 +347,11 @@ $("#category-search").on("select2:select", function(e) {
   var data = e.params.data
   // a little hacky but alright
   $.when(
-    $("#coloring-legend").css("height","20px")
+    populateLegend(data.id)
   ).done(function() {
     $("#coloring-legend").removeClass("hidden")
   })
+  console.log(data)
   for (var key in data.catData) {
     if (data.catData.hasOwnProperty(key)) {
       getNodeById(key).attr("fill", data.catData[key])   
@@ -405,6 +416,23 @@ $(".right-button").on("click", function(e) {
 // || NODE LEGEND CONTROL            ||
 // ||================================||
 
+var populateLegend = function(category) {
+  $("#coloring-legend").css("height","20px")
+  $("#coloring-legend").css("width","20px")
+  var contentDiv = $("#coloring-legend>.legend-content")
+  contentDiv.html("")
+  var categoryData = categorySortedLists[category]
+  categoryData.forEach(function(elt) {
+    eltDiv = '<div class="legend-elt"></div>'
+    contentDiv.append(eltDiv)
+    colorNum = '<div class="legend-color-num">' + elt[1] + '</div>'
+    valueName = '<div class="legend-value-name">' + elt[0] + '</div>'
+    contentDiv.children().last().append(colorNum)
+    contentDiv.children().last().append(valueName)
+  })
+}
+
+
 $(".bottom-legend").hover(function(e) {
   if (!$(this).children(".legend-bar").hasClass("click-anim")) {
     $(this).stop(true).animate({
@@ -435,7 +463,6 @@ $(".legend-bar").click(function(e) {
     $(this).parent().stop(true).animate({
       height: "240px"
     }, 200, function() {
-      console.log("test")
       $(this).children(".legend-bar").removeClass("click-anim")
     })
     $(this).parent().children(".legend-content").animate({

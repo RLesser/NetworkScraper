@@ -137,9 +137,27 @@ select {
 }
 
 .legend-content {
-	background-color: blue;
+	background-color: white;
 	height: 0px;
 	overflow: scroll;
+}
+
+.legend-elt {
+	margin: 2px;
+	display: block;
+	overflow: auto;
+}
+
+.legend-color-num {
+	background-color: lightblue;
+	width: 30%;
+	float: left;
+}
+
+.legend-value-name {
+	width: 70%;
+	float: right;
+	font-size: 10pt;
 }
 
 #coloring-legend {
