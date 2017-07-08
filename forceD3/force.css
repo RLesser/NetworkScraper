@@ -2,10 +2,19 @@ html body {
 	margin: 0px;
 	width: 100%;
 	height: 100vh;
+	overflow: hidden;
+}
+
+select {
+	opacity: 0;
+}
+
+.hidden {
+	opacity: 0;
+	pointer-events: none;
 }
 
 /* Graph CSS */
-
 #chart {
 	width: 100%;
 	height: 100%;
@@ -21,11 +30,16 @@ html body {
 	stroke-width: 1px;
 }
 
+.faded-node {
+	opacity: 0.2;
+}
+
 .links line {
 	stroke: #555;
 	stroke-opacity: .4;
 	stroke-width: 0.3px;
 }
+
 
 /* Search CSS */
 .left-control {
@@ -56,14 +70,14 @@ html body {
 	/*right: -300px;*/
 }
 
-/* Sizing control */
 
+/* Sizing control */
 #sizing {
 	top: 100px;
 }
 
-/* Color control */
 
+/* Color control */
 #coloring {
 	top: 160px;
 }
@@ -96,3 +110,74 @@ html body {
 }
 
 
+/*categoy legend*/
+.bottom-legend {
+	position: absolute;
+	bottom: 20px;
+	left: 40px;
+	border: 2px solid black;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.legend-bar {
+	width: 100%;
+	height: 20px;
+	cursor: pointer;
+	background-color: white;
+}
+
+.legend-icon {
+	width: 16px;
+	margin: 2px;
+	float: right;
+}
+
+.legend-control {
+	width: 16px;
+	margin: 2px;
+	float: left;
+	display: none;
+}
+
+.legend-content {
+	background-color: white;
+	height: 0px;
+	overflow: scroll;
+}
+
+.legend-elt {
+	padding: 1px;
+	display: block;
+	overflow: auto;
+}
+
+.legend-elt:hover {
+	background-color: lightgray;
+}
+
+.selected-elt {
+	background-color: lightblue;
+}
+
+.legend-color-num {
+	background-color: lightgreen;
+	width: 20%;
+	float: left;
+	border-radius: 4px;
+	text-align: right;
+	padding-right: 4px;
+}
+
+.legend-value-name {
+	width: 74%;
+	float: right;
+	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;
+  	padding-left: 4px;
+}
+
+#coloring-legend {
+	left: 40px;
+}

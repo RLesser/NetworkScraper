@@ -50,7 +50,7 @@ d3.json("force.json", function(error, graph) {
   if (error) throw error;
 
   nodeList = graph.nodes
-  console.log(nodeList)
+  // console.log(nodeList)
   initSelectBox(nodeList)
 
   var link = vis.append("g")
@@ -65,7 +65,7 @@ d3.json("force.json", function(error, graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("idValue", function(d) {return d.id})
+      .attr("id", function(d) {return d.id})
       .attr("fill", defaultColor)
       .attr("r", defaultRadius)
       .attr("size", "")
@@ -117,7 +117,7 @@ function dragended(d) {
 }
 
 // ||================================||
-// || NODE SEARCHING AND ALTERING    ||
+// || INITIALIZATION FUNCTIONS       ||
 // ||================================||
 
 var fuseOptions = {
@@ -136,7 +136,11 @@ var fuseOptions = {
 var currentSelectedNodeId = ""
 
 function getNodeById(nodeId) {
-  return d3.select('[idValue="' + nodeId + '"]')
+  return d3.select('#' + $.escapeSelector(nodeId))
+}
+
+function getAllNodes() {
+  return $(".nodes").children()
 }
 
 function setNodeTitle(nodeObj) {
@@ -184,6 +188,8 @@ function getNumericProperties(nodeList) {
   return numericPropDict
 }
 
+var categorySortedLists = {}
+
 function getCategoricalProperties(nodeList) {
   var nonNumericProps = Object.keys(nodeList[0].properties).filter(function(elt) {
     return !$.isNumeric(nodeList[0].properties[elt])
@@ -209,10 +215,16 @@ function getCategoricalProperties(nodeList) {
       return -(countKeeper[a] - countKeeper[b])
     })
 
+    var sortedPairs = sortedList.map(function(key) {
+      return [key, countKeeper[key]]
+    })
+
     // If more than a third of nodes are unique categories, invalid category
     if (sortedList.length * 3 >= nodeList.length) {
       return "Invalid Category"
     }
+
+    categorySortedLists[key] = sortedPairs
 
     // for each node, find the index of value in the sorted list, get corresponding color
 
@@ -221,7 +233,9 @@ function getCategoricalProperties(nodeList) {
       color = COLOR_LIST[sortedList.indexOf(propData[nodeId].toString())]
       nodeIdToColor[nodeId] = color
     }
-        
+    
+    // console.log(nodeIdToColor)    
+
     var category = {
       catData: nodeIdToColor,
       catName: propData, 
@@ -247,7 +261,7 @@ function initSelectBox(nodeList) {
     return o;
   })
 
-  console.log(nodeList)
+  // console.log(nodeList)
   if (nodeList[0].hasOwnProperty("properties")) {
     var numericData = getNumericProperties(nodeList)
 
@@ -284,11 +298,16 @@ function initSelectBox(nodeList) {
   });
 }
 
+// ||================================||
+// || NODE CONTROL INTERACTION       ||
+// ||================================||
+
 $("#node-search").on("select2:select", function(e) {
   var nodeData = e.params.data
-  getNodeById(nodeData.id).attr("class", "nodes selected")
+  var node = getNodeById(nodeData.id)
+  node.attr("class", "nodes selected")
   if (currentSelectedNodeId != "") {
-    getNodeById(currentSelectedNodeId).attr("class", "nodes")
+    node.attr("class", "nodes")
   }
     currentSelectedNodeId = nodeData.id
 })
@@ -309,11 +328,11 @@ $("#property-search").on("select2:select", function(e) {
 
   for (var key in data.propData) {
     if (data.propData.hasOwnProperty(key)) {
+      var node = getNodeById(key)
       var outputRadius = convertRange(data.propData[key], range1, squaredRange2)
-      getNodeById(key).attr("r", Math.sqrt(outputRadius))
-      getNodeById(key).attr("size", data.propData[key])
-      console.log("key:", key)
-      setNodeTitle(getNodeById(key))
+      node.attr("r", Math.sqrt(outputRadius))
+      node.attr("size", data.propData[key])
+      setNodeTitle(node)
     }
   }
 })
@@ -321,32 +340,41 @@ $("#property-search").on("select2:select", function(e) {
 $("#property-search").on("select2:unselect", function(e) {
   for (var key in e.params.data.propData) {
     if (e.params.data.propData.hasOwnProperty(key)) {
-      getNodeById(key).attr("r", defaultRadius)
-      getNodeById(key).attr("size", "")
-      console.log("key:", key)
-      setNodeTitle(getNodeById(key))
+      var node = getNodeById(key)
+      node.attr("r", defaultRadius)
+      node.attr("size", "")
+      setNodeTitle(node)
     }
   }
 })
 
 $("#category-search").on("select2:select", function(e) {
   var data = e.params.data
-
+  // a little hacky but alright
+  $.when(
+    populateLegend(data.id)
+  ).done(function() {
+    $("#coloring-legend").removeClass("hidden")
+  })
+  // console.log(data)
   for (var key in data.catData) {
     if (data.catData.hasOwnProperty(key)) {
-      getNodeById(key).attr("fill", data.catData[key])   
-      getNodeById(key).attr("category", data.catName[key])
-      setNodeTitle(getNodeById(key)) 
+      var node = getNodeById(key)
+      node.attr("fill", data.catData[key])   
+      node.attr("category", data.catName[key])
+      setNodeTitle(node) 
     }
   }
 })
 
 $("#category-search").on("select2:unselect", function(e) {
+  $("#coloring-legend").addClass("hidden")
   for (var key in e.params.data.catData) {
     if (e.params.data.catData.hasOwnProperty(key)) {
-      getNodeById(key).attr("fill", defaultColor)
-      getNodeById(key).attr("category", "")
-      setNodeTitle(getNodeById(key)) 
+      var node = getNodeById(key)
+      node.attr("fill", defaultColor)
+      node.attr("category", "")
+      setNodeTitle(node) 
     }
   }
 })
@@ -390,6 +418,149 @@ $(".right-button").on("click", function(e) {
     simulation.restart()
   }
 })
+
+// ||================================||
+// || NODE LEGEND CONTROL            ||
+// ||================================||
+
+var generateLegendElement = function(elementData, color) {
+  var elementHTML = [
+   "<div class='legend-elt'>",
+   "  <div class='legend-color-num' style='background-color:" + color + ";'>",
+        elementData[1],
+   "  </div>",
+   "  <div class='legend-value-name'>",
+        elementData[0],
+   "  </div>",
+   "</div>",
+   ""
+  ].join("\n")
+  return elementHTML
+}
+
+var populateLegend = function(category) {
+  $("#coloring-legend").css("height","20px")
+  $("#coloring-legend").css("width","20px")
+  var contentDiv = $("#coloring-legend>.legend-content")
+  contentDiv.html("")
+  var categoryData = categorySortedLists[category]
+  var colorIdx = 0
+  categoryData.forEach(function(elt) {
+    var color = COLOR_LIST[colorIdx]
+    contentDiv.append(generateLegendElement(elt, color))
+    colorIdx += 1
+  })
+}
+
+var fadeNode = function(mode, valuesToAffect, exceptions) {
+  var action = ""
+  if (mode == "fade") {
+    action = function(node) { node.addClass("faded-node") }
+  } else {
+    action = function(node) { node.removeClass("faded-node") }
+  }
+
+  console.log(valuesToAffect, exceptions)
+  $.each(getAllNodes(), function(nodeIdx, nodeVal) {
+    var node = $(nodeVal)
+    console.log(node.attr("category"))
+    if (valuesToAffect == "all") {
+      if ($.inArray(node.attr("category"), exceptions)) {
+        console.log(mode, "all")
+        action(node)
+      }
+    } else if (!$.inArray(node.attr("category"), valuesToAffect)) {
+      console.log(mode, "specifically")
+      action(node)
+    }
+  })
+}
+
+
+$(".bottom-legend").hover(function(e) {
+  if (!$(this).children(".legend-bar").hasClass("click-anim")) {
+    $(this).stop(true).animate({
+      width: "160px"
+    }, 200, function() {
+      if (!$(this).children(".legend-bar").hasClass("expanded")) {
+        $("#legend-expand").fadeIn(50)
+      }
+    })
+  }
+}, function(e) {
+  if (!$(this).children(".legend-bar").hasClass("expanded") &&
+      !$(this).children(".legend-bar").hasClass("click-anim")) {
+    $(this).stop(true).animate({
+      width: "20px"
+    }, 200, function() {})
+    $("#legend-expand").fadeOut(50)
+  }
+})
+
+$(".legend-bar").click(function(e) {
+  $(this).addClass("click-anim")
+  if (!$(this).hasClass("expanded")) {
+    $(this).addClass("expanded")
+    $.when($("#legend-expand").fadeOut(50)).done(function() {
+      $("#legend-retract").fadeIn(50)    
+    })
+    $(this).parent().animate({
+      height: "240px"
+    }, 200, function() {
+      $(this).children(".legend-bar").removeClass("click-anim")
+    })
+    $(this).parent().children(".legend-content").animate({
+      height: "220px"
+    }, 200, function() {})
+  } else {
+    $(this).removeClass("expanded")
+    $.when($("#legend-retract").fadeOut(50)).done(function() {
+      $("#legend-expand").fadeIn(50)    
+    })
+    $(this).parent().animate({
+      height: "20px"
+    }, 200, function() {
+      $("#legend-expand").fadeOut(50)
+      $(this).animate({
+        width: "20px"
+      }, 200, function() {
+        $(this).children(".legend-bar").removeClass("click-anim")
+      })
+    })
+    $(this).parent().children(".legend-content").animate({
+      height: "0px"
+    }, 200, function() {})
+  }
+})
+
+$(".legend-content").on("click", ".legend-elt", function(e) {
+  $(this).toggleClass("selected-elt")
+  var currentCategory = $(this).children(".legend-value-name").text()
+  if ($(this).hasClass("selected-elt")) {
+    $(this).parent().attr("num-selected", 
+                          function(i, oldval) { return parseInt(oldval, 10) + 1})
+    if ($(this).parent().attr("num-selected") == 1) {
+      console.log("only one selected")
+      fadeNode("fade", "all", [$.trim(currentCategory)])
+    } else {
+      fadeNode("unfade", [$.trim(currentCategory)], [])
+    }
+
+  } else {
+    $(this).parent().attr("num-selected", 
+                          function(i, oldval) { return parseInt(oldval, 10) - 1})
+    if ($(this).parent().attr("num-selected") == 0) {
+      console.log("zero selected")
+      fadeNode("unfade", "all", [])
+    } else {
+      fadeNode("fade", [$.trim(currentCategory)], [])
+    }
+  }
+})
+
+
+
+
 
 
 //Color list from here: https://jnnnnn.blogspot.com.au/2017/02/distinct-colours-2.html
