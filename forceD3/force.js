@@ -50,7 +50,7 @@ d3.json("force.json", function(error, graph) {
   if (error) throw error;
 
   nodeList = graph.nodes
-  console.log(nodeList)
+  // console.log(nodeList)
   initSelectBox(nodeList)
 
   var link = vis.append("g")
@@ -65,7 +65,7 @@ d3.json("force.json", function(error, graph) {
     .selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-      .attr("idValue", function(d) {return d.id})
+      .attr("id", function(d) {return d.id})
       .attr("fill", defaultColor)
       .attr("r", defaultRadius)
       .attr("size", "")
@@ -136,7 +136,7 @@ var fuseOptions = {
 var currentSelectedNodeId = ""
 
 function getNodeById(nodeId) {
-  return d3.select('[idValue="' + nodeId + '"]')
+  return d3.select('#' + $.escapeSelector(nodeId))
 }
 
 function setNodeTitle(nodeObj) {
@@ -230,7 +230,7 @@ function getCategoricalProperties(nodeList) {
       nodeIdToColor[nodeId] = color
     }
     
-    console.log(nodeIdToColor)    
+    // console.log(nodeIdToColor)    
 
     var category = {
       catData: nodeIdToColor,
@@ -257,7 +257,7 @@ function initSelectBox(nodeList) {
     return o;
   })
 
-  console.log(nodeList)
+  // console.log(nodeList)
   if (nodeList[0].hasOwnProperty("properties")) {
     var numericData = getNumericProperties(nodeList)
 
@@ -300,9 +300,10 @@ function initSelectBox(nodeList) {
 
 $("#node-search").on("select2:select", function(e) {
   var nodeData = e.params.data
-  getNodeById(nodeData.id).attr("class", "nodes selected")
+  var node = getNodeById(nodeData.id)
+  node.attr("class", "nodes selected")
   if (currentSelectedNodeId != "") {
-    getNodeById(currentSelectedNodeId).attr("class", "nodes")
+    node.attr("class", "nodes")
   }
     currentSelectedNodeId = nodeData.id
 })
@@ -323,11 +324,11 @@ $("#property-search").on("select2:select", function(e) {
 
   for (var key in data.propData) {
     if (data.propData.hasOwnProperty(key)) {
+      var node = getNodeById(key)
       var outputRadius = convertRange(data.propData[key], range1, squaredRange2)
-      getNodeById(key).attr("r", Math.sqrt(outputRadius))
-      getNodeById(key).attr("size", data.propData[key])
-      console.log("key:", key)
-      setNodeTitle(getNodeById(key))
+      node.attr("r", Math.sqrt(outputRadius))
+      node.attr("size", data.propData[key])
+      setNodeTitle(node)
     }
   }
 })
@@ -335,10 +336,10 @@ $("#property-search").on("select2:select", function(e) {
 $("#property-search").on("select2:unselect", function(e) {
   for (var key in e.params.data.propData) {
     if (e.params.data.propData.hasOwnProperty(key)) {
-      getNodeById(key).attr("r", defaultRadius)
-      getNodeById(key).attr("size", "")
-      console.log("key:", key)
-      setNodeTitle(getNodeById(key))
+      var node = getNodeById(key)
+      node.attr("r", defaultRadius)
+      node.attr("size", "")
+      setNodeTitle(node)
     }
   }
 })
@@ -351,12 +352,13 @@ $("#category-search").on("select2:select", function(e) {
   ).done(function() {
     $("#coloring-legend").removeClass("hidden")
   })
-  console.log(data)
+  // console.log(data)
   for (var key in data.catData) {
     if (data.catData.hasOwnProperty(key)) {
-      getNodeById(key).attr("fill", data.catData[key])   
-      getNodeById(key).attr("category", data.catName[key])
-      setNodeTitle(getNodeById(key)) 
+      var node = getNodeById(key)
+      node.attr("fill", data.catData[key])   
+      node.attr("category", data.catName[key])
+      setNodeTitle(node) 
     }
   }
 })
@@ -365,9 +367,10 @@ $("#category-search").on("select2:unselect", function(e) {
   $("#coloring-legend").addClass("hidden")
   for (var key in e.params.data.catData) {
     if (e.params.data.catData.hasOwnProperty(key)) {
-      getNodeById(key).attr("fill", defaultColor)
-      getNodeById(key).attr("category", "")
-      setNodeTitle(getNodeById(key)) 
+      var node = getNodeById(key)
+      node.attr("fill", defaultColor)
+      node.attr("category", "")
+      setNodeTitle(node) 
     }
   }
 })
@@ -416,6 +419,21 @@ $(".right-button").on("click", function(e) {
 // || NODE LEGEND CONTROL            ||
 // ||================================||
 
+var generateLegendElement = function(elementData, color) {
+  var elementHTML = [
+   "<div class='legend-elt'>",
+   "  <div class='legend-color-num' style='background-color:" + color + ";'>",
+        elementData[1],
+   "  </div>",
+   "  <div class='legend-value-name'>",
+        elementData[0],
+   "  </div>",
+   "</div>",
+   ""
+  ].join("\n")
+  return elementHTML
+}
+
 var populateLegend = function(category) {
   $("#coloring-legend").css("height","20px")
   $("#coloring-legend").css("width","20px")
@@ -424,13 +442,8 @@ var populateLegend = function(category) {
   var categoryData = categorySortedLists[category]
   var colorIdx = 0
   categoryData.forEach(function(elt) {
-    eltDiv = '<div class="legend-elt"></div>'
-    contentDiv.append(eltDiv)
-    colorNum = '<div class="legend-color-num">' + elt[1] + '</div>'
-    valueName = '<div class="legend-value-name">' + elt[0] + '</div>'
-    contentDiv.children().last().append(colorNum)
-    contentDiv.children().last().append(valueName)
-    contentDiv.children().last().children(".legend-color-num").css("background-color", COLOR_LIST[colorIdx])
+    var color = COLOR_LIST[colorIdx]
+    contentDiv.append(generateLegendElement(elt, color))
     colorIdx += 1
   })
 }
@@ -463,7 +476,7 @@ $(".legend-bar").click(function(e) {
     $.when($("#legend-expand").fadeOut(50)).done(function() {
       $("#legend-retract").fadeIn(50)    
     })
-    $(this).parent().stop(true).animate({
+    $(this).parent().animate({
       height: "240px"
     }, 200, function() {
       $(this).children(".legend-bar").removeClass("click-anim")
