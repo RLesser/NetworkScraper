@@ -113,6 +113,8 @@ select {
 /*categoy legend*/
 .bottom-legend {
 	position: absolute;
+	width: 20px;
+	height: 20px;
 	bottom: 20px;
 	left: 40px;
 	border: 2px solid black;

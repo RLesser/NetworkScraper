@@ -26,7 +26,7 @@ ns = TagNetwork()
 # time.sleep(5)
 
 # ns.saveGraph('cerulean_all_flags')
-ns.loadGraph('lfm_100')
+ns.loadGraph('hypeM_1000')
 
 # ns.colorNodes(keyProperty = "vowelPos")
 

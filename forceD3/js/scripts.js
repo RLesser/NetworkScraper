@@ -348,7 +348,11 @@ $("#property-search").on("select2:unselect", function(e) {
   }
 })
 
+var previousAction = "none"
+
 $("#category-search").on("select2:select", function(e) {
+  previousAction = "select"
+  fadeNode("unfade", "all", [])
   var data = e.params.data
   // a little hacky but alright
   $.when(
@@ -368,7 +372,9 @@ $("#category-search").on("select2:select", function(e) {
 })
 
 $("#category-search").on("select2:unselect", function(e) {
+  previousAction = "unselect"
   $("#coloring-legend").addClass("hidden")
+  fadeNode("unfade", "all", [])
   for (var key in e.params.data.catData) {
     if (e.params.data.catData.hasOwnProperty(key)) {
       var node = getNodeById(key)
@@ -439,8 +445,8 @@ var generateLegendElement = function(elementData, color) {
 }
 
 var populateLegend = function(category) {
-  $("#coloring-legend").css("height","20px")
-  $("#coloring-legend").css("width","20px")
+  // $("#coloring-legend").css("height","20px")
+  // $("#coloring-legend").css("width","20px")
   var contentDiv = $("#coloring-legend>.legend-content")
   contentDiv.html("")
   var categoryData = categorySortedLists[category]
@@ -460,17 +466,17 @@ var fadeNode = function(mode, valuesToAffect, exceptions) {
     action = function(node) { node.removeClass("faded-node") }
   }
 
-  console.log(valuesToAffect, exceptions)
+  // console.log(valuesToAffect, exceptions)
   $.each(getAllNodes(), function(nodeIdx, nodeVal) {
     var node = $(nodeVal)
-    console.log(node.attr("category"))
+    // console.log(node.attr("category"))
     if (valuesToAffect == "all") {
       if ($.inArray(node.attr("category"), exceptions)) {
-        console.log(mode, "all")
+        // console.log(mode, "all")
         action(node)
       }
     } else if (!$.inArray(node.attr("category"), valuesToAffect)) {
-      console.log(mode, "specifically")
+      // console.log(mode, "specifically")
       action(node)
     }
   })
@@ -540,7 +546,7 @@ $(".legend-content").on("click", ".legend-elt", function(e) {
     $(this).parent().attr("num-selected", 
                           function(i, oldval) { return parseInt(oldval, 10) + 1})
     if ($(this).parent().attr("num-selected") == 1) {
-      console.log("only one selected")
+      // console.log("only one selected")
       fadeNode("fade", "all", [$.trim(currentCategory)])
     } else {
       fadeNode("unfade", [$.trim(currentCategory)], [])
@@ -550,7 +556,7 @@ $(".legend-content").on("click", ".legend-elt", function(e) {
     $(this).parent().attr("num-selected", 
                           function(i, oldval) { return parseInt(oldval, 10) - 1})
     if ($(this).parent().attr("num-selected") == 0) {
-      console.log("zero selected")
+      // console.log("zero selected")
       fadeNode("unfade", "all", [])
     } else {
       fadeNode("fade", [$.trim(currentCategory)], [])
